@@ -3,7 +3,6 @@
 namespace Drupal\commerce_exchanger\Entity;
 
 use Drupal\commerce\CommerceSinglePluginCollection;
-use Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider\ExchangerProviderRemoteInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 
 /**
@@ -24,7 +23,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
  *     },
  *   },
- *   admin_permission = "administer site configuration",
+ *   admin_permission = "administer commerce exchanger settings",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "label",
