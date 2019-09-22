@@ -4,6 +4,7 @@ namespace Drupal\commerce_exchanger\Entity;
 
 use Drupal\commerce\CommerceSinglePluginCollection;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
  * Defines the Exchange rates entity.
@@ -191,6 +192,14 @@ class ExchangeRates extends ConfigEntityBase implements ExchangeRatesInterface {
       $this->pluginCollection = new CommerceSinglePluginCollection($plugin_manager, $this->plugin, $this->configuration, $this->id);
     }
     return $this->pluginCollection;
+  }
+
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
+
+    // Declare dependency on config where we store exchange rates.
+    // So when we delete entity that those data are also deleted.
+    $this->addDependency('config', $this->getExchangerConfigName());
   }
 
 }
