@@ -3,6 +3,7 @@
 namespace Drupal\commerce_exchanger;
 
 use Drupal\commerce_price\Price;
+use Drupal\commerce_price\RounderInterface;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
@@ -28,36 +29,37 @@ class DefaultExchangerCalculator implements ExchangerCalculatorInterface {
    */
   protected $configFactory;
 
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, ConfigFactory $config_factory) {
+  /**
+   * @var \Drupal\commerce_price\RounderInterface
+   */
+  protected $rounder;
+
+  /**
+   * DefaultExchangerCalculator constructor.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\Config\ConfigFactory $config_factory
+   * @param \Drupal\commerce_price\RounderInterface $rounder
+   */
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, ConfigFactory $config_factory, RounderInterface $rounder) {
     $this->configFactory = $config_factory;
     $this->providers = $entity_type_manager->getStorage('commerce_exchange_rates')->loadByProperties(['status' => TRUE]);
+    $this->rounder = $rounder;
   }
 
   /**
-   * Currency conversion for prices.
-   *
-   * @param \Drupal\commerce_price\Price $price
-   *   Price object.
-   * @param string $target_currency
-   *   Target currency.
-   *
-   * @return \Drupal\commerce_price\Price|static
-   *   Return updated price object with new currency.
+   * {@inheritdoc}
    */
   public function priceConversion(Price $price, $target_currency) {
-    // Get currency conversion settings.
-    $config = \Drupal::config('commerce_currency_resolver.currency_conversion');
-
-    // Get specific settings.
-    $mapping = $config->get('exchange');
+    $exchange_rates = $this->configFactory->get($this->getExchangeRates());
 
     // Current currency.
     $current_currency = $price->getCurrencyCode();
 
     // Determine rate.
     $rate = NULL;
-    if (isset($mapping[$current_currency][$target_currency])) {
-      $rate = $mapping[$current_currency][$target_currency]['value'];
+    if (isset($exchange_rates[$current_currency][$target_currency])) {
+      $rate = $exchange_rates[$current_currency][$target_currency]['value'];
     }
 
     // Fallback to use 1 as rate.
@@ -67,10 +69,19 @@ class DefaultExchangerCalculator implements ExchangerCalculatorInterface {
 
     // Convert. Convert rate to string.
     $price = $price->convert($target_currency, (string) $rate);
-    $rounder = \Drupal::service('commerce_price.rounder');
-    $price = $rounder->round($price);
+    $price = $this->rounder->round($price);
     return $price;
   }
 
+  /**
+   * Return configuration file of active provider.
+   *
+   * @return string
+   *   Return provider.
+   */
+  public function getExchangeRates() {
+    $provider = end($this->providers);
+    return $provider->getExchangerConfigName();
+  }
 
 }

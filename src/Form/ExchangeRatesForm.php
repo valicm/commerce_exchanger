@@ -202,7 +202,7 @@ class ExchangeRatesForm extends EntityForm {
           ];
 
           // Based on cross sync value render form elements.
-          if (isset($plugin_configuration['use_cross_sync']) && $plugin_configuration['use_cross_sync'] === 1) {
+          if (isset($plugin_configuration['use_cross_sync']) && $plugin_configuration['use_cross_sync'] == 1) {
             $form['exchange_rates'][$key][$subkey]['value']['#description'] = $this->t('Exchange rate derived from @initial using cross sync.', [
               '@initial' => $plugin_configuration['base_currency'],
             ]);
