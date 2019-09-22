@@ -1,0 +1,5 @@
+entity.commerce_exchange_rates.add_form:
+  route_name: entity.commerce_exchange_rates.add_form
+  title: 'Add Exchange rates'
+  appears_on:
+    - entity.commerce_exchange_rates.collection
