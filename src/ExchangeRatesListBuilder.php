@@ -14,7 +14,7 @@ class ExchangeRatesListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    //\Drupal::service('commerce_exchanger.import')->run();
+    \Drupal::service('commerce_exchanger.import')->run();
     $header['label'] = $this->t('Exchange rates');
     $header['id'] = $this->t('Machine name');
     return $header + parent::buildHeader();

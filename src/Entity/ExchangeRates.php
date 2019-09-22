@@ -162,12 +162,6 @@ class ExchangeRates extends ConfigEntityBase implements ExchangeRatesInterface {
     ];
   }
 
-  public function import() {
-    $plugin = $this->getPlugin();
-    assert($plugin instanceof ExchangerProviderRemoteInterface);
-    $plugin->import();
-  }
-
   /**
    * {@inheritdoc}
    */

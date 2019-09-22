@@ -235,9 +235,10 @@ abstract class ExchangerProviderBase extends PluginBase implements ExchangerProv
         '#title' => t('Exchange rates cron'),
         '#description' => t('Select how often exchange rates should be imported. Note about EBC, they update exchange rates once a day'),
         '#options' => [
-          4 => t('6 hours'),
-          2 => t('12 hours'),
           1 => t('Once a day'),
+          2 => t('12 hours'),
+          3 => t('8 hours'),
+          4 => t('6 hours'),
         ],
         '#default_value' => $definition['refresh_once'] ?? $this->configuration['cron'],
         '#disabled' => $definition['refresh_once']
