@@ -90,15 +90,4 @@ interface ExchangerProviderRemoteInterface {
    */
   public function processRemoteData();
 
-  /**
-   * Rates calculation for currencies when we use enterprise mode.
-   *
-   * @param array $data
-   *   All currencies and rate array.
-   *
-   * @return array
-   *   Return data prepared for saving.
-   */
-  public function enterpriseCalculate($data);
-
 }

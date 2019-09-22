@@ -44,64 +44,20 @@ class FixerExchanger extends ExchangerProviderRemoteBase {
     $request = $this->apiClient($options);
 
     if ($request) {
-      $json = Json::decode($request);
+      $json = Json::decode($request, FALSE);
 
-      if ($json->success) {
+      if (!empty($json['success'])) {
         // Leave base currency. In some cases we don't know base currency.
         // Fixer.io on free plan uses your address for base currency, and in
         // Drupal you could have different default value.
-        $data['base'] = $json->base;
+        unset($json['timestamp'], $json['success'], $json['date']);
 
-        // Loop and build array.
-        foreach ($json->rates as $key => $value) {
-          $data['rates'][$key] = $value;
-        }
+        // This structure is what we need.
+        $data = $json;
       }
     }
 
     return $data;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function processRemoteData() {
-    $exchange_rates = [];
-
-    if ($data = $this->getRemoteData()) {
-
-      // Based on cross sync settings fetch and process data.
-      if ($this->useCrossSync()) {
-        $exchange_rates = $this->crossSyncCalculate($data['base'], $data['rates']);
-      }
-
-      // Fetch each currency.
-      else {
-        $exchange_rates = $this->enterpriseCalculate($data);
-      }
-    }
-
-    return $exchange_rates;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function enterpriseCalculate($data) {
-    $exchange_rates = [];
-
-    // Enabled currency.
-    $currencies = $this->currencies;
-
-    foreach ($currencies as $base => $name) {
-      // Foreach enabled currency fetch others.
-      if ($data[$base]) {
-        $get_rates = $this->mapExchangeRates($data[$base]['rates'], $base);
-        $exchange_rates[$base] = $get_rates[$base];
-      }
-    }
-
-    return $exchange_rates;
   }
 
 }

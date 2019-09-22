@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider;
 
-use Drupal\commerce_exchanger\Exception\ExchangeRatesDataMismatchException;
 use GuzzleHttp\Exception\GuzzleException;
 
 /**
@@ -88,6 +87,7 @@ abstract class ExchangerProviderRemoteBase extends  ExchangerProviderBase implem
     // force cross sync, regardless of the settings.
     // Or if we choose to use cross sync.
     if ((!$this->isEnterprise() && !empty($base_currency)) || $this->useCrossSync()) {
+      // @todo legacy from currency resolver. Needed to make data validator to ensure same structure.
       if ($data = $this->getRemoteData()) {
         $base_currency = $data['base'] ?? $base_currency;
         $base_rates = $data['rates'] ?? $data;
@@ -97,24 +97,18 @@ abstract class ExchangerProviderRemoteBase extends  ExchangerProviderBase implem
     }
 
     else {
-      $enterprise = [];
       // Fetch per each currency and make a data set.
-      foreach ($this->currencies as $currency) {
-        $enterprise += $this->getRemoteData($currency);
+      foreach ($this->currencies as $code => $currency) {
+        // @todo legacy from currency resolver. Needed to make data validator to ensure same structure.
+        $currency_data = $this->getRemoteData($code);
+        $base_currency = $data['base'] ?? $code;
+        $base_rates = $currency_data['rates'] ?? $currency_data;
+        $get_rates = $this->mapExchangeRates($base_rates, $base_currency);
+        $exchange_rates[$code] = $get_rates[$code];
       }
-
-      $exchange_rates =  $this->enterpriseCalculate($enterprise);
     }
 
     return $exchange_rates;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function enterpriseCalculate($data) {
-    // Do nothing. Placeholder. We could make additional interface for
-    // this maybe.
   }
 
   /**
@@ -169,14 +163,17 @@ abstract class ExchangerProviderRemoteBase extends  ExchangerProviderBase implem
 
     // Loop trough data, set new values or leave manually defined.
     foreach ($data as $currency => $rate) {
-      if (empty($mapping[$base_currency][$currency]['sync'])) {
-        $exchange_rates[$base_currency][$currency]['value'] = $rate;
-        $sync_settings = $mapping[$base_currency][$currency]['sync'] ?? 0;
-        $exchange_rates[$base_currency][$currency]['sync'] = $sync_settings;
-      }
+      // Skip base currency to map to itself.
+      if ($currency != $base_currency) {
+        if (empty($mapping[$base_currency][$currency]['sync'])) {
+          $exchange_rates[$base_currency][$currency]['value'] = $rate;
+          $sync_settings = $mapping[$base_currency][$currency]['sync'] ?? 0;
+          $exchange_rates[$base_currency][$currency]['sync'] = $sync_settings;
+        }
 
-      else {
-        $exchange_rates[$base_currency][$currency] = $mapping[$base_currency][$currency];
+        else {
+          $exchange_rates[$base_currency][$currency] = $mapping[$base_currency][$currency];
+        }
       }
     }
 
