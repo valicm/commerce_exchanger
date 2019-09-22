@@ -14,9 +14,9 @@ class ExchangeRatesListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    \Drupal::service('commerce_exchanger.import')->run();
     $header['label'] = $this->t('Exchange rates');
     $header['id'] = $this->t('Machine name');
+    $header['mode'] = $this->t('Mode');
     return $header + parent::buildHeader();
   }
 
@@ -24,8 +24,10 @@ class ExchangeRatesListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
+    $configuration = $entity->getPluginConfiguration();
     $row['label'] = $entity->label();
     $row['id'] = $entity->id();
+    $row['mode'] = $configuration['mode'];
     // You probably want a few more properties here...
     return $row + parent::buildRow($entity);
   }
