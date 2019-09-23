@@ -103,8 +103,12 @@ abstract class ExchangerProviderRemoteBase extends  ExchangerProviderBase implem
         $currency_data = $this->getRemoteData($code);
         $base_currency = $data['base'] ?? $code;
         $base_rates = $currency_data['rates'] ?? $currency_data;
-        $get_rates = $this->mapExchangeRates($base_rates, $base_currency);
-        $exchange_rates[$code] = $get_rates[$code];
+
+        if (!empty($base_rates)) {
+          $get_rates = $this->mapExchangeRates($base_rates, $base_currency);
+          $exchange_rates[$code] = $get_rates[$code];
+        }
+
       }
     }
 
@@ -132,9 +136,11 @@ abstract class ExchangerProviderRemoteBase extends  ExchangerProviderBase implem
       foreach ($currencies as $currency_code => $name) {
         $recalculate = $this->reverseCalculate($currency_code, $base_currency, $data);
 
-        // Prepare data.
-        $get_rates = $this->mapExchangeRates($recalculate, $currency_code);
-        $exchange_rates[$currency_code] = $get_rates[$currency_code];
+        if (!empty($recalculate)) {
+          // Prepare data.
+          $get_rates = $this->mapExchangeRates($recalculate, $currency_code);
+          $exchange_rates[$currency_code] = $get_rates[$currency_code];
+        }
       }
     }
 
