@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_exchanger;
 
+use Drupal\commerce_exchanger\Exception\ExchangeRatesDataMismatchException;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_price\RounderInterface;
 use Drupal\Core\Config\ConfigFactory;
@@ -54,7 +55,7 @@ class DefaultExchangerCalculator implements ExchangerCalculatorInterface {
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, ConfigFactory $config_factory, RounderInterface $rounder) {
     $this->configFactory = $config_factory;
-    $this->providers = $entity_type_manager->getStorage('commerce_exchange_rates')->loadByProperties(['status' => TRUE]);
+    $this->providers = $entity_type_manager->getStorage('commerce_exchange_rates')->loadMultiple();
     $this->rounder = $rounder;
   }
 
@@ -62,7 +63,13 @@ class DefaultExchangerCalculator implements ExchangerCalculatorInterface {
    * {@inheritdoc}
    */
   public function priceConversion(Price $price, $target_currency) {
-    $exchange_rates = $this->configFactory->get($this->getExchangeRates())->get();
+    $exchange_rates_config = $this->getExchangeRates();
+
+    if (empty($exchange_rates_config)) {
+      throw new ExchangeRatesDataMismatchException('Missing exchanger provider plugin');
+    }
+
+    $exchange_rates = $this->configFactory->get($exchange_rates_config)->get();
 
     // Current currency.
     $current_currency = $price->getCurrencyCode();
@@ -83,8 +90,11 @@ class DefaultExchangerCalculator implements ExchangerCalculatorInterface {
    *   Return provider.
    */
   public function getExchangeRates() {
-    $provider = end($this->providers);
-    return $provider->getExchangerConfigName();
+    foreach ($this->providers as $provider) {
+      if ($provider->status()) {
+        return $provider->getExchangerConfigName();
+      }
+    }
   }
 
 }
