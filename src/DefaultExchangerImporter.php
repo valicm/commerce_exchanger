@@ -48,6 +48,9 @@ class DefaultExchangerImporter implements ExchangerImporterInterface {
     $this->state = $state;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function run($force = FALSE) {
     foreach ($this->providers as $provider) {
       assert($provider instanceof ExchangeRatesInterface);

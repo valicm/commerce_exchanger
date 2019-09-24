@@ -68,7 +68,7 @@ class CommerceExchangerProvider extends Plugin {
   public $enterprise = FALSE;
 
   /**
-   * External provider supports historical rates
+   * External provider supports historical rates.
    *
    * @var bool
    */

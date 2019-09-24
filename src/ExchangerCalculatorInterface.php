@@ -5,7 +5,7 @@ namespace Drupal\commerce_exchanger;
 use Drupal\commerce_price\Price;
 
 /**
- * Interface ExchangerCalculatorInterface
+ * Interface ExchangerCalculatorInterface.
  *
  * @package Drupal\commerce_exchanger
  */

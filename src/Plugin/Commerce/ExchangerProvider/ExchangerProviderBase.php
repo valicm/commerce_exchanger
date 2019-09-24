@@ -33,7 +33,7 @@ abstract class ExchangerProviderBase extends PluginBase implements ExchangerProv
   protected $httpClientFactory;
 
   /**
-   * Configuration managament.
+   * Configuration management.
    *
    * @var \Drupal\Core\Config\ConfigFactory
    */
@@ -47,7 +47,7 @@ abstract class ExchangerProviderBase extends PluginBase implements ExchangerProv
   protected $logger;
 
   /**
-   * Return formatted array of currencies ['HRK' => 'Croatian Kuna']
+   * Return formatted array of currencies ['HRK' => 'Croatian Kuna'].
    *
    * @var array
    */
@@ -246,7 +246,7 @@ abstract class ExchangerProviderBase extends PluginBase implements ExchangerProv
           4 => t('6 hours'),
         ],
         '#default_value' => $definition['refresh_once'] ?? $this->configuration['cron'],
-        '#disabled' => $definition['refresh_once']
+        '#disabled' => $definition['refresh_once'],
       ];
     }
 

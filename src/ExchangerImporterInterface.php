@@ -7,7 +7,7 @@ namespace Drupal\commerce_exchanger;
  *
  * @package Drupal\commerce_exchanger
  */
-interface ExchangerImporterInterface{
+interface ExchangerImporterInterface {
 
   /**
    * Triggers importing exchange rates.
