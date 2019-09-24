@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider;
 
-use Drupal\commerce_exchanger\Annotation\CommerceExchangerProvider;
 use Drupal\Component\Serialization\Json;
 
 /**

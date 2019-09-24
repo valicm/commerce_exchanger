@@ -194,6 +194,9 @@ class ExchangeRates extends ConfigEntityBase implements ExchangeRatesInterface {
     return $this->pluginCollection;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
 

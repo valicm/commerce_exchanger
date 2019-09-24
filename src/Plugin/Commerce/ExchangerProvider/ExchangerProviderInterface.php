@@ -15,6 +15,7 @@ interface ExchangerProviderInterface extends PluginInspectionInterface, PluginFo
    * Return config object name where exchange rates are saved.
    *
    * @return string
+   *   Return drupal config file name where exchange rates are imported.
    */
   public function getConfigName();
 

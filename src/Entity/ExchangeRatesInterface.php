@@ -15,6 +15,7 @@ interface ExchangeRatesInterface extends ConfigEntityInterface {
    * How config name for stored data should be called.
    *
    * @return string
+   *   Get machine config name where exchange rates are stored.
    */
   public function getExchangerConfigName();
 

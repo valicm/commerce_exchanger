@@ -7,7 +7,7 @@ use GuzzleHttp\Exception\GuzzleException;
 /**
  * Base class for Commerce exchanger provider plugins.
  */
-abstract class ExchangerProviderRemoteBase extends  ExchangerProviderBase implements ExchangerProviderRemoteInterface {
+abstract class ExchangerProviderRemoteBase extends ExchangerProviderBase implements ExchangerProviderRemoteInterface {
 
   /**
    * {@inheritdoc}
@@ -126,7 +126,7 @@ abstract class ExchangerProviderRemoteBase extends  ExchangerProviderBase implem
    * @return array
    *   Return data prepared for saving.
    */
-  protected function crossSyncCalculate($base_currency, $data) {
+  protected function crossSyncCalculate($base_currency, array $data) {
     $exchange_rates = [];
 
     // Enabled currency.
@@ -224,7 +224,7 @@ abstract class ExchangerProviderRemoteBase extends  ExchangerProviderBase implem
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function import() {
     $exchange_rates = $this->processRemoteData();
@@ -236,4 +236,5 @@ abstract class ExchangerProviderRemoteBase extends  ExchangerProviderBase implem
       $file->save();
     }
   }
+
 }

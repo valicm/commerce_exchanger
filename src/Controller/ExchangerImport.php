@@ -9,13 +9,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
- * Class ExchangerImport
+ * Class ExchangerImport.
  *
  * @package Drupal\commerce_exchanger\Controller
  */
 class ExchangerImport extends ControllerBase {
 
   /**
+   * Exchange importer.
+   *
    * @var \Drupal\commerce_exchanger\ExchangerImporterInterface
    */
   protected $importer;
@@ -24,6 +26,7 @@ class ExchangerImport extends ControllerBase {
    * ExchangerImport constructor.
    *
    * @param \Drupal\commerce_exchanger\ExchangerImporterInterface $importer
+   *   Exchange importer.
    */
   public function __construct(ExchangerImporterInterface $importer) {
     $this->importer = $importer;

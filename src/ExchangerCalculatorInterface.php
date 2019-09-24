@@ -22,6 +22,6 @@ interface ExchangerCalculatorInterface {
    * @return \Drupal\commerce_price\Price|static
    *   Return updated price object with new currency.
    */
-  function priceConversion(Price $price, $target_currency);
+  public function priceConversion(Price $price, $target_currency);
 
 }

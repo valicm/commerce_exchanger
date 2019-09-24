@@ -40,16 +40,22 @@ class CommerceExchangerProvider extends Plugin {
   public $modes = FALSE;
 
   /**
+   * Only currency which external provider supports.
+   *
    * @var string
    */
   public $base_currency;
 
   /**
+   * If external provider need api key.
+   *
    * @var bool
    */
   public $api_key = FALSE;
 
   /**
+   * If external provider need authentication.
+   *
    * @var bool
    */
   public $auth = FALSE;

@@ -8,23 +8,29 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\State\StateInterface;
 
 /**
- * Class DefaultExchangerImporter
+ * Class DefaultExchangerImporter.
  *
  * @package Drupal\commerce_exchanger
  */
 class DefaultExchangerImporter implements ExchangerImporterInterface {
 
   /**
+   * Entity type manager.
+   *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
+   * List of providers.
+   *
    * @var \Drupal\commerce_exchanger\Entity\ExchangeRatesInterface[]
    */
   protected $providers;
 
   /**
+   * Drupal state.
+   *
    * @var \Drupal\Core\State\StateInterface
    */
   protected $state;
@@ -33,7 +39,9 @@ class DefaultExchangerImporter implements ExchangerImporterInterface {
    * DefaultExchangerImporter constructor.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   Drupal entity manager.
    * @param \Drupal\Core\State\StateInterface $state
+   *   Drupal state handler.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, StateInterface $state) {
     $this->providers = $entity_type_manager->getStorage('commerce_exchange_rates')->loadByProperties(['status' => TRUE]);

@@ -2,8 +2,6 @@
 
 namespace Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider;
 
-use Drupal\commerce_exchanger\Annotation\CommerceExchangerProvider;
-
 /**
  * Provides Manual handling currencies.
  *

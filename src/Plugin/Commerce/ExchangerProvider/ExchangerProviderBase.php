@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Base class for Commerce exchanger provider plugins.
  */
-abstract class ExchangerProviderBase extends PluginBase implements ExchangerProviderInterface,ContainerFactoryPluginInterface {
+abstract class ExchangerProviderBase extends PluginBase implements ExchangerProviderInterface, ContainerFactoryPluginInterface {
 
   /**
    * The currency storage.
@@ -47,10 +47,9 @@ abstract class ExchangerProviderBase extends PluginBase implements ExchangerProv
   protected $logger;
 
   /**
-   * Simple key-value array for enabled currencies.
+   * Return formatted array of currencies ['HRK' => 'Croatian Kuna']
    *
-   * @return array
-   *   Return formatted array of currencies ['HRK' => 'Croatian Kuna']
+   * @var array
    */
   protected $currencies;
 
@@ -72,6 +71,12 @@ abstract class ExchangerProviderBase extends PluginBase implements ExchangerProv
    *   The plugin implementation definition.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   Currency storage.
+   * @param \Drupal\Core\Http\ClientFactory $http_client_factory
+   *   Drupal http client.
+   * @param \Drupal\Core\Config\ConfigFactory $config_factory
+   *   Config factory.
+   * @param \Psr\Log\LoggerInterface $logger_channel
+   *   Logger.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, ClientFactory $http_client_factory, ConfigFactory $config_factory, LoggerInterface $logger_channel) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
@@ -118,7 +123,7 @@ abstract class ExchangerProviderBase extends PluginBase implements ExchangerProv
       'base_currency' => '',
       'refresh_once' => FALSE,
       'manual' => FALSE,
-      'mode' => 'live'
+      'mode' => 'live',
     ];
   }
 
@@ -274,11 +279,9 @@ abstract class ExchangerProviderBase extends PluginBase implements ExchangerProv
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
-  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
-
-  }
+  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {}
 
   /**
    * Form submission handler.
@@ -302,7 +305,7 @@ abstract class ExchangerProviderBase extends PluginBase implements ExchangerProv
    * Simple key-value array for enabled currencies.
    *
    * @return array
-   *   Return formatted array of currencies ['HRK' => 'Croatian Kuna']
+   *   Return formatted array of currencies ['HRK' => 'Croatian Kuna'].
    */
   protected function getCurrencies() {
     $currency_storage = $this->currencyStorage->loadMultiple();
@@ -317,7 +320,7 @@ abstract class ExchangerProviderBase extends PluginBase implements ExchangerProv
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function getConfigName() {
     return ExchangeRatesInterface::COMMERCE_EXCHANGER_IMPORT . '.' . $this->entityId;
