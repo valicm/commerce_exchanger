@@ -5,7 +5,7 @@ CONTENTS OF THIS FILE
 * Requirements
 * Installation
 * Configuration
-* Exchange rates plugin
+* Plugin system
 * Maintainers
 
 
@@ -13,6 +13,19 @@ INTRODUCTION
 ------------
 
 Currency exchange rates module for Drupal Commerce 2.
+
+Features
+1. Manual defined or/and remote exchange rates.
+2. Built for Commerce 2
+3. Separate config yml files for exchanger definition and imported rates
+4. Provide default price conversion service
+5. Plugin based system.
+6. Integrated with Commerce Currency Resolver module
+
+Out of box are supported following exchange rates plugins:
+1. Manual plugin
+2. Fixer.io (free and paid)
+3. European Central Bank
 
 
 REQUIREMENTS
@@ -38,13 +51,42 @@ CONFIGURATION
                    > Exchange rates.
 
 
-EXCHANGE RATES PLUGIN
+PLUGIN SYSTEM
 --------------
-TBD
+See examples of implementation for external providers.
+`\Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider\FixerExchanger`
+`\Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider\EuropeanCentralBankExchanger`
 
-EXAMPLES
------------
 
+See `\Drupal\commerce_exchanger\Annotation\CommerceExchangerProvider`
+for available properties on CommerceExchangerProvider annotation plugin type.
+
+In most cases it would be enough to make proper annotation type 
+and implement two functions inside your plugin:
+`\Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider\ExchangerProviderRemoteInterface::apiUrl`
+`\Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider\ExchangerProviderRemoteInterface::getRemoteData`
+
+Note that function `getRemoteData()` should return array keyed as examples 
+below. If you follow that format, you don't need to implement anything more 
+in your plugin.
+
+```
+['HRK' => '1.3', 'USD' => '1.666']
+```
+
+or 
+
+```
+['base' => 'USD', 'rates' => ['HRK' => '1.3', 'EUR' => '1.666']]
+```
+
+Both formats are supported. First is mostly used when you know your base 
+currency or it is defined by end provider 
+(see plugin annotation for European Central Bank).
+
+Second format is redundant, but it is used as fallback on Fixer.io free account.
+There your base currency is based upon your profile on Fixer.io and can be 
+different from what you are using in Drupal.
 
 MAINTAINERS
 -----------
