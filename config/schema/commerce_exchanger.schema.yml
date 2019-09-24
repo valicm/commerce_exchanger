@@ -41,7 +41,7 @@ commerce_exchanger_provider_configuration:
       type: string
       label: 'Mode'
 
-latest_exchange_rates.*:
+commerce_exchanger.latest_exchange_rates.*:
   type: config_object
   label: 'Exchange rates'
   mapping:
