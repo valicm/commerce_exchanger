@@ -63,13 +63,13 @@ class DefaultExchangerCalculator implements ExchangerCalculatorInterface {
    * {@inheritdoc}
    */
   public function priceConversion(Price $price, $target_currency) {
-    $exchange_rates_config = $this->getExchangeRates();
+    $exchange_rates_config = $this->getExchangerId();
 
     if (empty($exchange_rates_config)) {
       throw new ExchangeRatesDataMismatchException('Missing exchanger provider plugin');
     }
 
-    $exchange_rates = $this->configFactory->get($exchange_rates_config)->get();
+    $exchange_rates = $this->getExchangeRates();
 
     // Current currency.
     $current_currency = $price->getCurrencyCode();
@@ -84,12 +84,16 @@ class DefaultExchangerCalculator implements ExchangerCalculatorInterface {
   }
 
   /**
-   * Return configuration file of active provider.
-   *
-   * @return string
-   *   Return provider.
+   * {@inheritdoc}
    */
   public function getExchangeRates() {
+    return $this->configFactory->get($this->getExchangerId())->get() ?? [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getExchangerId() {
     foreach ($this->providers as $provider) {
       if ($provider->status()) {
         return $provider->getExchangerConfigName();
