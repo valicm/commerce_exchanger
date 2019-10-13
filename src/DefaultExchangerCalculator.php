@@ -99,6 +99,8 @@ class DefaultExchangerCalculator implements ExchangerCalculatorInterface {
         return $provider->getExchangerConfigName();
       }
     }
+
+    return '';
   }
 
 }

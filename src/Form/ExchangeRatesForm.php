@@ -272,7 +272,7 @@ class ExchangeRatesForm extends EntityForm {
     /** @var \Drupal\commerce_exchanger\Entity\ExchangeRates $exchange_rates */
     $this->entity->save();
 
-    $this->messenger()->addMessage($this->t('Saved the %label tax type.', ['%label' => $this->entity->label()]));
+    $this->messenger()->addMessage($this->t('Saved the %label exchange rates.', ['%label' => $this->entity->label()]));
     $form_state->setRedirect('entity.commerce_exchange_rates.collection');
   }
 
