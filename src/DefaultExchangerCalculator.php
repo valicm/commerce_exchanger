@@ -66,7 +66,7 @@ class DefaultExchangerCalculator implements ExchangerCalculatorInterface {
     $exchange_rates_config = $this->getExchangerId();
 
     if (empty($exchange_rates_config)) {
-      throw new ExchangeRatesDataMismatchException('Missing exchanger provider plugin');
+      throw new ExchangeRatesDataMismatchException('Not any active exchanger rates present');
     }
 
     $exchange_rates = $this->getExchangeRates();

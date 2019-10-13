@@ -19,17 +19,16 @@ interface ExchangerCalculatorInterface {
    * @param string $target_currency
    *   Target currency.
    *
-   * @return \Drupal\commerce_price\Price|static
+   * @return \Drupal\commerce_price\Price
    *   Return updated price object with new currency.
    */
-  public function priceConversion(Price $price, $target_currency);
+  public function priceConversion(Price $price, string $target_currency);
 
   /**
    * Get all exchange rates.
    *
    * @return array
-   *   Return exchange rates for currency resolver exchange plugin used.
-   *
+   *   Return exchange rates which are used for calculations.
    */
   public function getExchangeRates();
 
