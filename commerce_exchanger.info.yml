@@ -2,6 +2,7 @@ name: 'Commerce Exchanger'
 type: module
 description: 'Commerce 2 Exchange Rates'
 core: 8.x
+core_version_requirement: ^8 || ^9
 package: Commerce (Contrib)
 
 dependencies:
