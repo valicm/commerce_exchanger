@@ -1,0 +1,167 @@
+<?php
+
+namespace Drupal\Tests\commerce_exchanger\Functional;
+
+use Drupal\commerce_exchanger\Entity\ExchangeRates;
+use Drupal\commerce_exchanger\Entity\ExchangeRatesInterface;
+use Drupal\commerce_price\Price;
+use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
+
+/**
+ * Tests the commerce exchanger UI.
+ *
+ * @group commerce_exchanger
+ */
+class CommerceExchangerTest extends CommerceBrowserTestBase {
+
+  /**
+   * Price in HRK currency.
+   *
+   * @var \Drupal\commerce_price\Price
+   */
+  protected $priceHrk;
+
+  /**
+   * Price in USD currency.
+   *
+   * @var \Drupal\commerce_price\Price
+   */
+  protected $priceUsd;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static $modules = [
+    'commerce_price',
+    'commerce_exchanger',
+  ];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getAdministratorPermissions() {
+    return array_merge([
+      'administer commerce exchanger settings',
+    ], parent::getAdministratorPermissions());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp();
+
+    // Add additional currency.
+    // The parent has already imported USD.
+    $currency_importer = $this->container->get('commerce_price.currency_importer');
+    $currency_importer->import('HRK');
+
+    $this->priceHrk = new Price('100', 'HRK');
+    $this->priceUsd = new Price('100', 'USD');
+  }
+
+  /**
+   * Tests adding a exchange rates.
+   */
+  public function testCommerceExchangerCreation() {
+    $this->drupalGet('admin/commerce/config/exchange-rates');
+    $this->getSession()->getPage()->clickLink('Add Exchange rates');
+    $add = [
+      'label' => 'European Central Bank',
+      'id' => 'ecb_test',
+    ];
+    $this->submitForm($add, 'Save');
+    $this->assertSession()->pageTextContains(t('Saved the @label exchange rates.', ['@label' => $add['label']]));
+
+    /** @var \Drupal\commerce_exchanger\Entity\ExchangeRatesInterface $exchange_rates */
+    $exchange_rates = ExchangeRates::load('ecb_test');
+
+    $this->assertEquals('ecb', $exchange_rates->getPluginId());
+    $this->assertEquals('European Central Bank', $exchange_rates->label());
+    $this->assertEquals(ExchangeRatesInterface::COMMERCE_EXCHANGER_IMPORT . 'ecb_test', $exchange_rates->getExchangerConfigName());
+
+    $rates = $this->config($exchange_rates->getExchangerConfigName())->get('rates');
+
+    $this->assertInternalType('array', $rates);
+    $this->assertInternalType('array', $rates['USD']['HRK']);
+    $this->assertEquals('0', $rates['USD']['HRK']['value']);
+
+    $this->drupalGet('admin/commerce/config/exchange-rates');
+    $this->getSession()->getPage()->clickLink('Run import');
+
+    $rates = $this->config($exchange_rates->getExchangerConfigName())->get('rates');
+    $this->assertInternalType('array', $rates);
+    $this->assertInternalType('array', $rates['USD']['HRK']);
+    $this->assertNotEqual('0', $rates['USD']['HRK']['value']);
+    $this->assertInternalType('float', $rates['USD']['HRK']['value']);
+
+  }
+
+  /**
+   * Tests editing a exchange rates.
+   */
+  public function testCommerceExchangerEditing() {
+    $exchange_rates = $this->createEntity('commerce_exchange_rates', [
+      'label' => 'ECB',
+      'id' => 'ecb',
+      'plugin' => 'ecb',
+      'status' => TRUE,
+    ]);
+
+    // There is no rates upon creation.
+    $price_test = $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceHrk, 'USD');
+    $this->assertEqual($price_test->getNumber(), '100.00');
+
+    // Import rates.
+    $this->drupalGet('admin/commerce/config/exchange-rates');
+    $this->getSession()->getPage()->clickLink('Run import');
+
+    $price_test = $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceHrk, 'USD');
+    $this->assertNotEqual($price_test->getNumber(), '100.00');
+
+    $this->drupalGet('admin/commerce/config/exchange-rates/' . $exchange_rates->id() . '/edit');
+
+    $edit = [
+      'label' => 'ECB edited',
+      'plugin' => 'fixer',
+      'configuration[ecb][enterprise]' => 1,
+      'status' => 0,
+    ];
+
+    $this->submitForm($edit, 'Save');
+
+    $exchange_rates = ExchangeRates::load('ecb');
+    $this->assertEqual($edit['label'], $exchange_rates->label());
+    $this->assertNotEqual($edit['plugin'], $exchange_rates->getPluginId());
+    $this->assertEqual($edit['status'], $exchange_rates->status());
+    $this->assertNotEqual($edit['configuration[ecb][enterprise]'], $exchange_rates->getPluginConfiguration()['enterprise']);
+  }
+
+  /**
+   * Tests deleting a exchange rates.
+   */
+  public function testCommerceExchangerDeletion() {
+    $exchange_rates = $this->createEntity('commerce_exchange_rates', [
+      'label' => 'ECB',
+      'id' => 'ecb',
+    ]);
+
+    $config_rates = $exchange_rates->getExchangerConfigName();
+    $entity_id = $exchange_rates->id();
+
+    $this->drupalGet('admin/commerce/config/exchange-rates/' . $entity_id . '/delete');
+    $this->assertSession()->pageTextContains(t('Are you sure you want to delete the exchange rates @exchange_rate?', ['@exchange_rate' => $exchange_rates->label()]));
+    $this->assertSession()->pageTextContains(t('This action cannot be undone.'));
+    $this->submitForm([], 'Delete');
+
+    $exchange_rates_exists = (bool) ExchangeRates::load($entity_id);
+    $this->assertEmpty($exchange_rates_exists, 'The exchange rates has been deleted from the database.');
+
+    $exchange_rates_config = $this->config($config_rates)->getRawData();
+    $this->assertEmpty($exchange_rates_config, 'The exchange rates configuration file has been deleted.');
+
+    $this->assertSession()->pageTextContains(t('There are no exchange rates entities yet.'));
+
+  }
+
+}

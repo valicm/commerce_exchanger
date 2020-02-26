@@ -95,7 +95,7 @@ class ExchangeRates extends ConfigEntityBase implements ExchangeRatesInterface {
     if (!$this->id) {
       return NULL;
     }
-    return self::COMMERCE_EXCHANGER_IMPORT . '.' . $this->id();
+    return self::COMMERCE_EXCHANGER_IMPORT . $this->id();
   }
 
   /**

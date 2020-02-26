@@ -9,7 +9,7 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
  */
 interface ExchangeRatesInterface extends ConfigEntityInterface {
 
-  public const COMMERCE_EXCHANGER_IMPORT = 'commerce_exchanger.latest_exchange_rates';
+  public const COMMERCE_EXCHANGER_IMPORT = 'commerce_exchanger.latest_exchange_rates.';
 
   /**
    * How config name for stored data should be called.

@@ -10,6 +10,8 @@ commerce_exchanger.commerce_exchange_rates.*:
       label: 'Label'
     uuid:
       type: string
+    plugin:
+      type: string
     configuration:
       type: commerce_exchanger.commerce_exchanger_provider.plugin.[%parent.plugin]
 
@@ -23,13 +25,20 @@ commerce_exchanger_provider_configuration:
       type: string
       label: 'Api Key'
     auth:
-      type: sequence
+      type: mapping
       label: 'Auth data'
+      mapping:
+        username:
+          type: string
+          label: 'Username'
+        password:
+          type: string
+          label: 'Password'
     cron:
       type: integer
       label: 'Cron'
     use_cross_sync:
-      type: bool
+      type: boolean
       label: 'Demo amount'
     base_currency:
       type: string
@@ -40,22 +49,33 @@ commerce_exchanger_provider_configuration:
     mode:
       type: string
       label: 'Mode'
+    enterprise:
+      type: boolean
+      label: 'Enterprise'
+    manual:
+      type: boolean
+      label: 'Manual'
+    refresh_once:
+      type: boolean
+      label: 'Refresh once'
 
 commerce_exchanger.latest_exchange_rates.*:
   type: config_object
   label: 'Exchange rates'
   mapping:
-    type: sequence
-    label: 'Exchange rates'
-    sequence:
+    rates:
       type: sequence
-      label: 'Currency upon exchanges is based'
+      label: 'List of currencies'
       sequence:
         type: sequence
-        label: 'Other currencies exchange rates'
-        value:
-          type: string
-          label: 'Value'
-        sync:
-          type: bool
-          label: 'Sync'
+        label: 'Currency upon exchanges is based'
+        sequence:
+          type: mapping
+          label: 'Other currencies exchange rates'
+          mapping:
+            value:
+              type: float
+              label: 'Value'
+            sync:
+              type: integer
+              label: 'Sync'

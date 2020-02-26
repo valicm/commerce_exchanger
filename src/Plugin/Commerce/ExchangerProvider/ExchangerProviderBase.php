@@ -323,7 +323,7 @@ abstract class ExchangerProviderBase extends PluginBase implements ExchangerProv
    * {@inheritdoc}
    */
   public function getConfigName() {
-    return ExchangeRatesInterface::COMMERCE_EXCHANGER_IMPORT . '.' . $this->entityId;
+    return ExchangeRatesInterface::COMMERCE_EXCHANGER_IMPORT . $this->entityId;
   }
 
 }

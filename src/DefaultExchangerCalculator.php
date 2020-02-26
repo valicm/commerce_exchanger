@@ -75,7 +75,7 @@ class DefaultExchangerCalculator implements ExchangerCalculatorInterface {
     $current_currency = $price->getCurrencyCode();
 
     // Determine rate.
-    $rate = $exchange_rates[$current_currency][$target_currency]['value'] ?? 1;
+    $rate = $exchange_rates['rates'][$current_currency][$target_currency]['value'] ?? 1;
 
     // Convert. Convert rate to string.
     $price = $price->convert($target_currency, (string) $rate);

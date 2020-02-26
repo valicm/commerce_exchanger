@@ -149,7 +149,7 @@ class ExchangeRatesForm extends EntityForm {
     $data = [];
 
     if ($existing = $exchange_rates->getExchangerConfigName()) {
-      $data = $this->configFactory->get($existing)->getRawData();
+      $data = $this->configFactory->get($existing)->get('rates');
     }
 
     // Load currencies.
@@ -255,7 +255,7 @@ class ExchangeRatesForm extends EntityForm {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
-    /** @var \Drupal\commerce_exchanger\Entity\ExchangeRate $exchange */
+    /** @var \Drupal\commerce_exchanger\Entity\ExchangeRates $exchange */
     $exchange = $this->entity;
 
     // Set provider plugin configuration.
@@ -280,7 +280,7 @@ class ExchangeRatesForm extends EntityForm {
    * {@inheritdoc}
    */
   protected function setExchangeRates(array $exchange_rates, string $name) {
-    $config = $this->configFactory->getEditable($name)->setData($exchange_rates);
+    $config = $this->configFactory->getEditable($name)->setData(['rates' => $exchange_rates]);
     $config->save();
   }
 

@@ -28,7 +28,7 @@ class ExchangeRatesListBuilder extends ConfigEntityListBuilder {
     $configuration = $entity->getPluginConfiguration();
     $row['label'] = $entity->label();
     $row['id'] = $entity->id();
-    $row['mode'] = $configuration['mode'];
+    $row['mode'] = $configuration['mode'] ?? 'live';
     $row['status'] = $entity->status() ? $this->t('Enabled') : $this->t('Disabled');
     // You probably want a few more properties here...
     return $row + parent::buildRow($entity);

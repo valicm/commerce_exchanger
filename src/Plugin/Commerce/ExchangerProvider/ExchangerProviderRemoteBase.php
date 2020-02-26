@@ -232,7 +232,7 @@ abstract class ExchangerProviderRemoteBase extends ExchangerProviderBase impleme
     // Write new data.
     if (!empty($exchange_rates)) {
       $file = $this->configFactory->getEditable($this->getConfigName());
-      $file->setData($exchange_rates);
+      $file->setData(['rates' => $exchange_rates]);
       $file->save();
     }
   }
