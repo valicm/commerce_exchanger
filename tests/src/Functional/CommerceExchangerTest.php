@@ -4,6 +4,8 @@ namespace Drupal\Tests\commerce_exchanger\Functional;
 
 use Drupal\commerce_exchanger\Entity\ExchangeRates;
 use Drupal\commerce_exchanger\Entity\ExchangeRatesInterface;
+use Drupal\commerce_exchanger\Exception\ExchangeRatesDataMismatchException;
+use Drupal\commerce_price\Entity\Currency;
 use Drupal\commerce_price\Price;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
@@ -61,7 +63,7 @@ class CommerceExchangerTest extends CommerceBrowserTestBase {
   }
 
   /**
-   * Tests adding a exchange rates.
+   * Tests adding a exchange rate.
    */
   public function testCommerceExchangerCreation() {
     $this->drupalGet('admin/commerce/config/exchange-rates');
@@ -98,7 +100,18 @@ class CommerceExchangerTest extends CommerceBrowserTestBase {
   }
 
   /**
-   * Tests editing a exchange rates.
+   * Tests adding a exchange rate without enough currencies.
+   */
+  public function testCommerceExchangerCreationDisabled() {
+    $hrk = Currency::load('HRK');
+    $hrk->delete();
+    $this->drupalGet('admin/commerce/config/exchange-rates');
+    $this->getSession()->getPage()->clickLink('Add Exchange rates');
+    $this->assertSession()->pageTextContains(t('Minimum of two currencies needs to be enabled, to be able to add exchange rates'));
+  }
+
+  /**
+   * Tests editing a exchange rate.
    */
   public function testCommerceExchangerEditing() {
     $exchange_rates = $this->createEntity('commerce_exchange_rates', [
@@ -109,8 +122,8 @@ class CommerceExchangerTest extends CommerceBrowserTestBase {
     ]);
 
     // There is no rates upon creation.
-    $price_test = $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceHrk, 'USD');
-    $this->assertEqual($price_test->getNumber(), '100.00');
+    $this->expectException(ExchangeRatesDataMismatchException::class);
+    $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceHrk, 'USD');
 
     // Import rates.
     $this->drupalGet('admin/commerce/config/exchange-rates');
@@ -138,7 +151,7 @@ class CommerceExchangerTest extends CommerceBrowserTestBase {
   }
 
   /**
-   * Tests deleting a exchange rates.
+   * Tests deleting a exchange rate.
    */
   public function testCommerceExchangerDeletion() {
     $exchange_rates = $this->createEntity('commerce_exchange_rates', [

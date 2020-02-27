@@ -108,13 +108,22 @@ class CommerceExchangerCalculatorTest extends CommerceKernelTestBase {
     $this->exchanger->setStatus(FALSE);
     $this->exchanger->save();
     $this->assertEmpty($this->container->get('commerce_exchanger.calculate')->getExchangerId());
+
+    $this->assertEmpty($this->container->get('commerce_exchanger.calculate')->getExchangeRates());
+
+    $this->expectException(ExchangeRatesDataMismatchException::class);
+    $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceUsd, 'HRK');
+
+    $this->expectException(ExchangeRatesDataMismatchException::class);
+    $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceHrk, 'USD');
   }
 
   /**
    * @covers ::getExchangeRates
    */
   public function testExchangeRates() {
-    $this->assertArrayHasKey('rates', $this->container->get('commerce_exchanger.calculate')->getExchangeRates());
+    $this->assertArrayHasKey('HRK', $this->container->get('commerce_exchanger.calculate')->getExchangeRates());
+    $this->assertArrayHasKey('USD', $this->container->get('commerce_exchanger.calculate')->getExchangeRates());
   }
 
   /**
@@ -138,6 +147,29 @@ class CommerceExchangerCalculatorTest extends CommerceKernelTestBase {
 
     $price_equal = $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceUsd, 'USD');
     $this->assertEqual(100.00, $price_equal->getNumber());
+
+    $this->config($this->exchangerId)->setData([
+      'rates' => [
+        'HRK' => [
+          'USD' => [
+            'value' => 0,
+            'sync' => 0,
+          ],
+        ],
+        'USD' => [
+          'HRK' => [
+            'value' => '0',
+            'sync' => 0,
+          ],
+        ],
+      ],
+    ])->save();
+
+    $this->expectException(ExchangeRatesDataMismatchException::class);
+    $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceUsd, 'HRK');
+
+    $this->expectException(ExchangeRatesDataMismatchException::class);
+    $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceHrk, 'USD');
 
   }
 

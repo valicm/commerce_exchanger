@@ -75,6 +75,17 @@ class ExchangeRatesForm extends EntityForm {
       return $form;
     }
 
+    // Load currencies.
+    $currencies = $this->currencyStorage->loadMultiple();
+
+    // If there is now two currencies enabled, do not allow saving.
+    if (count($currencies) < 2) {
+      $form['warning'] = [
+        '#markup' => $this->t('Minimum of two currencies needs to be enabled, to be able to add exchange rates'),
+      ];
+      return $form;
+    }
+
     return parent::buildForm($form, $form_state);
   }
 
