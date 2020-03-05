@@ -62,7 +62,7 @@ abstract class AbstractExchangerCalculator implements ExchangerCalculatorInterfa
   /**
    * {@inheritdoc}
    */
-  public function priceConversion(Price $price, $target_currency) {
+  public function priceConversion(Price $price, string $target_currency) {
     $exchange_rates_config = $this->getExchangerId();
 
     if (empty($exchange_rates_config)) {
