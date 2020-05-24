@@ -84,18 +84,18 @@ class CommerceExchangerTest extends CommerceBrowserTestBase {
 
     $rates = $this->config($exchange_rates->getExchangerConfigName())->get('rates');
 
-    $this->assertInternalType('array', $rates);
-    $this->assertInternalType('array', $rates['USD']['HRK']);
+    $this->assertIsArray($rates);
+    $this->assertIsArray($rates['USD']['HRK']);
     $this->assertEquals('0', $rates['USD']['HRK']['value']);
 
     $this->drupalGet('admin/commerce/config/exchange-rates');
     $this->getSession()->getPage()->clickLink('Run import');
 
     $rates = $this->config($exchange_rates->getExchangerConfigName())->get('rates');
-    $this->assertInternalType('array', $rates);
-    $this->assertInternalType('array', $rates['USD']['HRK']);
+    $this->assertIsArray($rates);
+    $this->assertIsArray($rates['USD']['HRK']);
     $this->assertNotEqual('0', $rates['USD']['HRK']['value']);
-    $this->assertInternalType('float', $rates['USD']['HRK']['value']);
+    $this->assertIsFloat($rates['USD']['HRK']['value']);
 
   }
 
