@@ -77,7 +77,7 @@ class ExchangerProviderRates {
         continue;
       }
 
-      $definition['rates'][$currency] = $this->transform ? 1 / $rate : $rate;
+      $definition['rates'][$currency] = round($this->transform ? 1 / $rate: $rate, 6);
     }
 
     $this->rates = $definition['rates'];

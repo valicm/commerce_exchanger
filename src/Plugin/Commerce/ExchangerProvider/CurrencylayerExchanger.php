@@ -5,24 +5,27 @@ namespace Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider;
 use Drupal\Component\Serialization\Json;
 
 /**
- * Provides the Fixer.io exchange rates.
+ * Provides the Currencylayer.com exchange rates.
  *
  * @CommerceExchangerProvider(
- *   id = "fixer",
- *   label = "Fixer.io",
- *   display_label = "Fixer.io",
+ *   id = "currencylayer",
+ *   label = "Currencylayer",
+ *   display_label = "currencylayer.com",
  *   historical_rates = TRUE,
  *   enterprise = TRUE,
  *   api_key= TRUE,
  * )
  */
-class FixerExchanger extends ExchangerProviderRemoteBase {
+class CurrencylayerExchanger extends ExchangerProviderRemoteBase {
 
   /**
    * {@inheritdoc}
    */
   public function apiUrl() {
-    return 'http://data.fixer.io/api/latest';
+    if ($this->isEnterprise()) {
+      return 'https://api.currencylayer.com/live';
+    }
+    return 'http://api.currencylayer.com/live';
   }
 
   /**
@@ -36,7 +39,7 @@ class FixerExchanger extends ExchangerProviderRemoteBase {
     ];
 
     // Add base currency if we use enterprise model.
-    if (!empty($base_currency) && $this->isEnterprise()) {
+    if ($this->isEnterprise()) {
       $options['query']['base'] = $base_currency;
     }
 
@@ -46,13 +49,15 @@ class FixerExchanger extends ExchangerProviderRemoteBase {
       $json = Json::decode($request);
 
       if (!empty($json['success'])) {
-        // Leave base currency. In some cases we don't know base currency.
-        // Fixer.io on free plan uses your address for base currency, and in
-        // Drupal you could have different default value.
-        unset($json['timestamp'], $json['success'], $json['date']);
 
-        // This structure is what we need.
-        $data = $json;
+        // Leave base currency. In some cases we don't know base currency.
+        // Currenclayer on free plan uses your address for base currency, and in
+        // Drupal you could have different default value.
+        $data['base'] = $json['source'];
+
+        foreach ($json['quotes'] as $code => $rate) {
+          $data['rates'][str_replace($json['source'], '', $code)] = $rate;
+        }
       }
     }
 

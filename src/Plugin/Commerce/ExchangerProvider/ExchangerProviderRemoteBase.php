@@ -232,7 +232,7 @@ abstract class ExchangerProviderRemoteBase extends ExchangerProviderBase impleme
     $rate_target_currency = $rates[$target_currency] ?? 1;
 
     // Get rate based from base currency.
-    $currency_default = 1 / $rate_target_currency;
+    $currency_default = round(1 / $rate_target_currency, 6);
 
     $recalculated = [];
     $recalculated[$base_currency] = $currency_default;
@@ -240,7 +240,7 @@ abstract class ExchangerProviderRemoteBase extends ExchangerProviderBase impleme
     // Recalculate all data.
     foreach ($rates as $currency => $rate) {
       if ($currency !== $target_currency) {
-        $recalculated[$currency] = $rate * $currency_default;
+        $recalculated[$currency] = round($rate * $currency_default, 6);
       }
     }
 
