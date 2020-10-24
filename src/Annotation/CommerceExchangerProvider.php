@@ -40,59 +40,66 @@ class CommerceExchangerProvider extends Plugin {
   public $modes = FALSE;
 
   /**
-   * Only currency which external provider supports.
+   * Base currency upon exchange rates are based.
    *
    * @var string
    */
   public $base_currency;
 
   /**
-   * If external provider need api key.
+   * Define if external provider need api key.
    *
    * @var bool
    */
   public $api_key = FALSE;
 
   /**
-   * If external provider need authentication.
+   * Define if external provider need authentication.
    *
    * @var bool
    */
   public $auth = FALSE;
 
   /**
-   * External provider supports fetching by any currency.
+   * Define if external provider supports fetching by any currency.
    *
    * @var bool
    */
   public $enterprise = FALSE;
 
   /**
-   * External provider supports historical rates.
+   * Define if external provider supports historical rates.
    *
    * @var bool
    */
   public $historical_rates = FALSE;
 
   /**
-   * If exchange list provider refresh currencies only once.
+   * Define if external provider refresh currencies only once a day.
    *
    * @var bool
    */
   public $refresh_once = FALSE;
 
   /**
-   * There is no external connection.
+   * Define if plugin is manual, without importing data from external provider.
    *
    * @var bool
    */
   public $manual = FALSE;
 
   /**
-   * Method for request.
+   * Define what type of request required for fetching exchange rates.
    *
    * @var bool
    */
   public $method = 'GET';
+
+  /**
+   * Define if the rates needs to be transformed - reverse calculated.
+   *
+   * @var bool
+   */
+  public $transform_rates = FALSE;
 
 }

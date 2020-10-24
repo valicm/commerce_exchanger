@@ -2,11 +2,6 @@
 
 namespace Drupal\commerce_exchanger;
 
-/**
- * Class DefaultExchangerCalculator.
- *
- * @package Drupal\commerce_exchanger
- */
 class DefaultExchangerCalculator extends AbstractExchangerCalculator {
 
   /**
@@ -20,7 +15,7 @@ class DefaultExchangerCalculator extends AbstractExchangerCalculator {
       }
     }
 
-    return '';
+    return NULL;
   }
 
 }

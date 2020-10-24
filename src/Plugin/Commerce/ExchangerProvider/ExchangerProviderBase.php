@@ -124,6 +124,7 @@ abstract class ExchangerProviderBase extends PluginBase implements ExchangerProv
       'refresh_once' => FALSE,
       'manual' => FALSE,
       'mode' => 'live',
+      'transform_rates' => FALSE,
     ];
   }
 

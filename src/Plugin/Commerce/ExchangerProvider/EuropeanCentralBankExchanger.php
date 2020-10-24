@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider;
 
-use SimpleXMLElement;
+use \SimpleXMLElement;
 
 /**
  * Provides EuropeanCentralBank.
@@ -13,7 +13,7 @@ use SimpleXMLElement;
  *   display_label = "European Central Bank",
  *   historical_rates = TRUE,
  *   base_currency = "EUR",
- *   refresh_once = TRUE
+ *   refresh_once = TRUE,
  * )
  */
 class EuropeanCentralBankExchanger extends ExchangerProviderRemoteBase {

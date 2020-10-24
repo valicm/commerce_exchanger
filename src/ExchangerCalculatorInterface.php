@@ -5,14 +5,14 @@ namespace Drupal\commerce_exchanger;
 use Drupal\commerce_price\Price;
 
 /**
- * Interface ExchangerCalculatorInterface.
+ * Provides default price calculator with exchange rates.
  *
  * @package Drupal\commerce_exchanger
  */
 interface ExchangerCalculatorInterface {
 
   /**
-   * Currency conversion for prices.
+   * Preform currency conversion for prices.
    *
    * @param \Drupal\commerce_price\Price $price
    *   Price object.
@@ -33,9 +33,9 @@ interface ExchangerCalculatorInterface {
   public function getExchangeRates();
 
   /**
-   * Return configuration file of active provider.
+   * Return configuration file of active provider or NULL.
    *
-   * @return string
+   * @return string|null
    *   Return provider.
    */
   public function getExchangerId();

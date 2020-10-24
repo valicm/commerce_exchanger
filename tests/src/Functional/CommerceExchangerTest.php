@@ -71,6 +71,7 @@ class CommerceExchangerTest extends CommerceBrowserTestBase {
     $add = [
       'label' => 'European Central Bank',
       'id' => 'ecb_test',
+      'plugin' => 'ecb',
     ];
     $this->submitForm($add, 'Save');
     $this->assertSession()->pageTextContains(t('Saved the @label exchange rates.', ['@label' => $add['label']]));
@@ -94,7 +95,7 @@ class CommerceExchangerTest extends CommerceBrowserTestBase {
     $rates = $this->config($exchange_rates->getExchangerConfigName())->get('rates');
     $this->assertIsArray($rates);
     $this->assertIsArray($rates['USD']['HRK']);
-    $this->assertNotEqual('0', $rates['USD']['HRK']['value']);
+    $this->assertIsNotString($rates['USD']['HRK']['value']);
     $this->assertIsFloat($rates['USD']['HRK']['value']);
 
   }
@@ -157,6 +158,7 @@ class CommerceExchangerTest extends CommerceBrowserTestBase {
     $exchange_rates = $this->createEntity('commerce_exchange_rates', [
       'label' => 'ECB',
       'id' => 'ecb',
+      'plugin' => 'ecb',
     ]);
 
     $config_rates = $exchange_rates->getExchangerConfigName();

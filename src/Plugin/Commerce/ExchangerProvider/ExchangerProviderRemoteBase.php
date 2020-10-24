@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider;
 
+use Drupal\commerce_exchanger\ExchangerProviderRates;
 use GuzzleHttp\Exception\GuzzleException;
 
 /**
@@ -54,6 +55,13 @@ abstract class ExchangerProviderRemoteBase extends ExchangerProviderBase impleme
   /**
    * {@inheritdoc}
    */
+  public function transformRates() {
+    return $this->pluginDefinition['transform_rates'] ?? FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function apiClient(array $options) {
     $data = [];
 
@@ -75,115 +83,134 @@ abstract class ExchangerProviderRemoteBase extends ExchangerProviderBase impleme
   }
 
   /**
-   * {@inheritdoc}
+   * Process all currencies for rates for other currencies.
+   *
+   * @return array
+   *   Return prepared data for saving.
    */
-  public function processRemoteData() {
+  protected function buildExchangeRates() {
+    // If we use enterprise and we don't want cross sync feature.
+    if ($this->isEnterprise() && !$this->useCrossSync()) {
+      return $this->importEnterprise();
+    }
+
+    // Everything else.
+    return $this->importCrossSync();
+  }
+
+  /**
+   * Preform cross conversion between currencies to build exchange data rates.
+   *
+   * @return array
+   *   Return array of exchange rates.
+   */
+  protected function importCrossSync() {
+    $exchange_rates_data = $this->processRemoteData();
+    // Based on cross sync settings fetch and process data.
+    return $this->crossSyncCalculate($exchange_rates_data);
+  }
+
+  /**
+   * Fetch remote provider by each currency and create dataset.
+   *
+   * @return array
+   *   Return array of exchange rates.
+   */
+  protected function importEnterprise() {
     $exchange_rates = [];
-
-    // User defined or provider defined base currency.
-    $base_currency = $this->getBaseCurrency();
-
-    // If we have only base currency upon calculation is done,
-    // force cross sync, regardless of the settings.
-    // Or if we choose to use cross sync.
-    if ((!$this->isEnterprise() && !empty($base_currency)) || $this->useCrossSync()) {
-      // @todo legacy from currency resolver. Needed to make data validator to ensure same structure.
-      if ($data = $this->getRemoteData()) {
-        $base_currency = $data['base'] ?? $base_currency;
-        $base_rates = $data['rates'] ?? $data;
-        // Based on cross sync settings fetch and process data.
-        $exchange_rates = $this->crossSyncCalculate($base_currency, $base_rates);
-      }
+    foreach ($this->currencies as $code => $currency) {
+      $exchange_rates_data = $this->processRemoteData($code);
+      $exchange_rates += $this->mapExchangeRates($exchange_rates_data);
     }
-
-    else {
-      // Fetch per each currency and make a data set.
-      foreach ($this->currencies as $code => $currency) {
-        // @todo legacy from currency resolver. Needed to make data validator to ensure same structure.
-        $currency_data = $this->getRemoteData($code);
-        $base_currency = $data['base'] ?? $code;
-        $base_rates = $currency_data['rates'] ?? $currency_data;
-
-        if (!empty($base_rates)) {
-          $get_rates = $this->mapExchangeRates($base_rates, $base_currency);
-          $exchange_rates[$code] = $get_rates[$code];
-        }
-
-      }
-    }
-
     return $exchange_rates;
+  }
+
+  /**
+   * Process data with checking structure and preparing data for importing.
+   *
+   * @param string|null $base_currency
+   *   The base currency or null if none.
+   *
+   * @return \Drupal\commerce_exchanger\ExchangerProviderRates
+   *   The ExchangeRates.
+   */
+  protected function processRemoteData(string $base_currency = NULL) {
+    $remote_data = $this->getRemoteData($base_currency);
+
+    // Validate and build structure.
+    if (!isset($remote_data['base'], $remote_data['rates'])) {
+      $exchange_rates['rates'] = $remote_data ?? [];
+      $exchange_rates['base'] = $base_currency ?? $this->getBaseCurrency();
+    }
+    else {
+      $exchange_rates = $remote_data;
+    }
+
+    // Pass enabled currencies to automatically filter data.
+    $exchange_rates['currencies'] = $this->getCurrencies();
+    $exchange_rates['transform'] = $this->transformRates();
+    return new ExchangerProviderRates($exchange_rates);
   }
 
   /**
    * Rates calculation for currencies when we use cross sync conversion.
    *
-   * @param string $base_currency
-   *   Base currency upon which we have exchange rates.
-   * @param array $data
-   *   Currency and rate array. Data should be in format: $data[$code] = $rate.
+   * @param \Drupal\commerce_exchanger\ExchangerProviderRates $exchange_rates
+   *   The ExchangeRates.
    *
    * @return array
    *   Return data prepared for saving.
    */
-  protected function crossSyncCalculate($base_currency, array $data) {
-    $exchange_rates = [];
+  protected function crossSyncCalculate(ExchangerProviderRates $exchange_rates) {
+    $calculated_rates = [];
 
     // Enabled currency.
     $currencies = $this->currencies;
 
-    if ($data) {
-      foreach ($currencies as $currency_code => $name) {
-        $recalculate = $this->reverseCalculate($currency_code, $base_currency, $data);
-
-        if (!empty($recalculate)) {
-          // Prepare data.
-          $get_rates = $this->mapExchangeRates($recalculate, $currency_code);
-          $exchange_rates[$currency_code] = $get_rates[$currency_code];
-        }
-      }
+    foreach ($currencies as $currency_code => $name) {
+      $calculate_rates = $this->recalculateRates($currency_code, $exchange_rates);
+      $map_rates = $this->mapExchangeRates($calculate_rates);
+      $calculated_rates[$currency_code] = $map_rates[$currency_code];
     }
 
-    return $exchange_rates;
+    return $calculated_rates;
   }
 
   /**
    * Helper function to create array for exchange rates.
    *
-   * @param array $data
-   *   New fetched data, array format: currency_code => rate.
-   * @param string $base_currency
-   *   Parent currency upon we build array.
+   * @param \Drupal\commerce_exchanger\ExchangerProviderRates $exchange_rates
+   *   The ExchangeRates.
    *
    * @return array
    *   Return array prepared for saving in Drupal config.
    */
-  protected function mapExchangeRates(array $data, $base_currency) {
-
+  protected function mapExchangeRates(ExchangerProviderRates $exchange_rates) {
     // Get current exchange rates.
     $mapping = $this->configFactory->get($this->getConfigName())->getRawData();
 
+    $rates = $exchange_rates->getRates();
+    $base_currency = $exchange_rates->getBaseCurrency();
+
     // Set defaults.
-    $exchange_rates = [];
-    $exchange_rates[$base_currency] = [];
+    $calculated_rates = [];
+    $calculated_rates[$base_currency] = [];
 
     // Loop trough data, set new values or leave manually defined.
-    foreach ($data as $currency => $rate) {
+    foreach ($rates as $currency => $rate) {
       // Skip base currency to map to itself.
-      if ($currency != $base_currency) {
+      if ($currency !== $base_currency) {
         if (empty($mapping[$base_currency][$currency]['sync'])) {
-          $exchange_rates[$base_currency][$currency]['value'] = $rate;
-          $sync_settings = $mapping[$base_currency][$currency]['sync'] ?? 0;
-          $exchange_rates[$base_currency][$currency]['sync'] = $sync_settings;
+          $calculated_rates[$base_currency][$currency]['value'] = $rate;
+          $calculated_rates[$base_currency][$currency]['sync'] = $mapping[$base_currency][$currency]['sync'] ?? 0;
         }
-
         else {
-          $exchange_rates[$base_currency][$currency] = $mapping[$base_currency][$currency];
+          $calculated_rates[$base_currency][$currency] = $mapping[$base_currency][$currency];
         }
       }
     }
 
-    return $exchange_rates;
+    return $calculated_rates;
   }
 
   /**
@@ -191,21 +218,18 @@ abstract class ExchangerProviderRemoteBase extends ExchangerProviderBase impleme
    *
    * @param string $target_currency
    *   Currency to which should be exchange rate calculated.
-   * @param string $base_currency
-   *   Base currency upon which we have exchange rates.
-   * @param array $data
+   * @param \Drupal\commerce_exchanger\ExchangerProviderRates $data
    *   Currency and rate array.
    *
-   * @return array
+   * @return \Drupal\commerce_exchanger\ExchangerProviderRates
    *   Return recalculated data.
    */
-  protected function reverseCalculate($target_currency, $base_currency, array $data) {
-
-    // Get all enabled currencies.
-    $currencies = $this->currencies;
+  protected function recalculateRates(string $target_currency, ExchangerProviderRates $data) {
+    $rates = $data->getRates();
+    $base_currency = $data->getBaseCurrency();
 
     // If we accidentally sent same target and base currency.
-    $rate_target_currency = !empty($data[$target_currency]) ? $data[$target_currency] : 1;
+    $rate_target_currency = $rates[$target_currency] ?? 1;
 
     // Get rate based from base currency.
     $currency_default = 1 / $rate_target_currency;
@@ -214,20 +238,23 @@ abstract class ExchangerProviderRemoteBase extends ExchangerProviderBase impleme
     $recalculated[$base_currency] = $currency_default;
 
     // Recalculate all data.
-    foreach ($data as $currency => $rate) {
-      if ($currency !== $target_currency && isset($currencies[$currency])) {
+    foreach ($rates as $currency => $rate) {
+      if ($currency !== $target_currency) {
         $recalculated[$currency] = $rate * $currency_default;
       }
     }
 
-    return $recalculated;
+    return new ExchangerProviderRates([
+      'base' => $target_currency,
+      'rates' => $recalculated,
+    ]);
   }
 
   /**
    * {@inheritdoc}
    */
   public function import() {
-    $exchange_rates = $this->processRemoteData();
+    $exchange_rates = $this->buildExchangeRates();
 
     // Write new data.
     if (!empty($exchange_rates)) {

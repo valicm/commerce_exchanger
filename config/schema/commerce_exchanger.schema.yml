@@ -58,6 +58,9 @@ commerce_exchanger_provider_configuration:
     refresh_once:
       type: boolean
       label: 'Refresh once'
+    transform_rates:
+      type: boolean
+      label: 'Transform rates'
 
 commerce_exchanger.latest_exchange_rates.*:
   type: config_object

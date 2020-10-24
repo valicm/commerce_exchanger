@@ -22,7 +22,7 @@ Features
 5. Plugin based system.
 6. Integrated with Commerce Currency Resolver module
 
-Out of box are supported following exchange rates plugins:
+Out of box supported are following exchange rates plugins:
 1. Manual plugin
 2. Fixer.io (free and paid)
 3. European Central Bank
@@ -45,7 +45,7 @@ Visit https://www.drupal.org/node/1897420 for further information.
 CONFIGURATION
 --------------
 
-    1. Navigate to Administration > Extend and enable the Commerce Exchanger 
+    1. Navigate to Administration > Extend and enable the Commerce Exchanger
        module.
     2. Navigate to Home > Administration > Commerce > Configuration
                    > Exchange rates.
@@ -61,31 +61,31 @@ See examples of implementation for external providers.
 See `\Drupal\commerce_exchanger\Annotation\CommerceExchangerProvider`
 for available properties on CommerceExchangerProvider annotation plugin type.
 
-In most cases it would be enough to make proper annotation type 
+In most cases it would be enough to make proper annotation type
 and implement two functions inside your plugin:
 `\Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider\ExchangerProviderRemoteInterface::apiUrl`
 `\Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider\ExchangerProviderRemoteInterface::getRemoteData`
 
-Note that function `getRemoteData()` should return array keyed as examples 
-below. If you follow that format, you don't need to implement anything more 
+Note that function `getRemoteData()` should return array keyed as examples
+below. If you follow that format, you don't need to implement anything more
 in your plugin.
-
+see `\Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider\ExchangerProviderRemoteBase::processRemoteData`
 ```
 ['HRK' => '1.3', 'USD' => '1.666']
 ```
 
-or 
+or
 
 ```
 ['base' => 'USD', 'rates' => ['HRK' => '1.3', 'EUR' => '1.666']]
 ```
 
-Both formats are supported. First is mostly used when you know your base 
-currency or it is defined by end provider 
+Both formats are supported. First is mostly used when you know your base
+currency, or it is defined by end provider
 (see plugin annotation for European Central Bank).
 
 Second format is redundant, but it is used as fallback on Fixer.io free account.
-There your base currency is based upon your profile on Fixer.io and can be 
+There your base currency, is based upon your profile on Fixer.io and can be
 different from what you are using in Drupal.
 
 MAINTAINERS

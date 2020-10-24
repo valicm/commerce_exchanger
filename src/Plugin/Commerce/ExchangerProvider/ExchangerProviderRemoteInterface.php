@@ -59,6 +59,15 @@ interface ExchangerProviderRemoteInterface {
   public function getAuthData();
 
   /**
+   * Determine if rates provided by provider needs to be transformed
+   * in a required rate ratio based on base currency.
+   *
+   * @return bool
+   *   Return true if transfrom rates is ON.
+   */
+  public function transformRates();
+
+  /**
    * Either remote provider defined base currency, or use entered.
    *
    * @return string
@@ -77,17 +86,9 @@ interface ExchangerProviderRemoteInterface {
   /**
    * Fetch external data.
    *
-   * @param string $base_currency
+   * @param string|null $base_currency
    *   If we fetch data based on specific currency.
    */
   public function getRemoteData($base_currency = NULL);
-
-  /**
-   * Process all currencies for rates for other currencies.
-   *
-   * @return array
-   *   Return prepared data for saving.
-   */
-  public function processRemoteData();
 
 }

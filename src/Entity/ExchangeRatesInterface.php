@@ -12,7 +12,7 @@ interface ExchangeRatesInterface extends ConfigEntityInterface {
   public const COMMERCE_EXCHANGER_IMPORT = 'commerce_exchanger.latest_exchange_rates.';
 
   /**
-   * How config name for stored data should be called.
+   * Name of the configuration file where exchange rates are stored.
    *
    * @return string
    *   Get machine config name where exchange rates are stored.

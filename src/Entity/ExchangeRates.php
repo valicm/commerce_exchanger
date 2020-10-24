@@ -3,6 +3,7 @@
 namespace Drupal\commerce_exchanger\Entity;
 
 use Drupal\commerce\CommerceSinglePluginCollection;
+use Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider\ExchangerProviderRemoteInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 
@@ -203,6 +204,25 @@ class ExchangeRates extends ConfigEntityBase implements ExchangeRatesInterface {
     // Declare dependency on config where we store exchange rates.
     // So when we delete entity that those data are also deleted.
     $this->addDependency('config', $this->getExchangerConfigName());
+
+    /** @var \Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider\ExchangerProviderInterface $plugin */
+    $plugin = $this->getPlugin();
+
+    if (empty($this->getPluginConfiguration()) && $plugin instanceof ExchangerProviderRemoteInterface) {
+      $definition = $plugin->getPluginDefinition();
+      $configuration = $plugin->defaultConfiguration();
+
+      if (!empty($definition['base_currency'])) {
+        $configuration['use_cross_sync'] = !empty($definition['base_currency']);
+        $configuration['base_currency'] = $definition['base_currency'];
+      }
+
+      $configuration['refresh_once'] = $definition['refresh_once'] ?? FALSE;
+      $configuration['transform_rates'] = $definition['transform_rates'] ?? FALSE;
+
+      $this->setPluginConfiguration($configuration);
+    }
+
   }
 
 }
