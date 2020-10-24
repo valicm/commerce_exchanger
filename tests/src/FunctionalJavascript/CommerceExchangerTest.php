@@ -1,20 +1,20 @@
 <?php
 
-namespace Drupal\Tests\commerce_exchanger\Functional;
+namespace Drupal\Tests\commerce_exchanger\FunctionalJavascript;
 
 use Drupal\commerce_exchanger\Entity\ExchangeRates;
 use Drupal\commerce_exchanger\Entity\ExchangeRatesInterface;
 use Drupal\commerce_exchanger\Exception\ExchangeRatesDataMismatchException;
 use Drupal\commerce_price\Entity\Currency;
 use Drupal\commerce_price\Price;
-use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
+use Drupal\Tests\commerce\FunctionalJavascript\CommerceWebDriverTestBase;
 
 /**
  * Tests the commerce exchanger UI.
  *
  * @group commerce_exchanger
  */
-class CommerceExchangerTest extends CommerceBrowserTestBase {
+class CommerceExchangerTest extends CommerceWebDriverTestBase {
 
   /**
    * Price in HRK currency.
@@ -68,13 +68,22 @@ class CommerceExchangerTest extends CommerceBrowserTestBase {
   public function testCommerceExchangerCreation() {
     $this->drupalGet('admin/commerce/config/exchange-rates');
     $this->getSession()->getPage()->clickLink('Add Exchange rates');
+
+    $this->getSession()->getPage()->fillField('label', 'European Central Bank');
+    $this->getSession()->getPage()->selectFieldOption('plugin', 'ecb');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+
+    $this->getSession()->getPage()->pressButton('Edit');
+    $this->getSession()->getPage()->fillField('id', 'ecb');
+
     $add = [
       'label' => 'European Central Bank',
       'id' => 'ecb_test',
       'plugin' => 'ecb',
     ];
     $this->submitForm($add, 'Save');
-    $this->assertSession()->pageTextContains(t('Saved the @label exchange rates.', ['@label' => $add['label']]));
+
+    $this->assertSession()->pageTextContains(t('Saved the @label exchange rates.', ['@label' => 'European Central Bank']));
 
     /** @var \Drupal\commerce_exchanger\Entity\ExchangeRatesInterface $exchange_rates */
     $exchange_rates = ExchangeRates::load('ecb_test');

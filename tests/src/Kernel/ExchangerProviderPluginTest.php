@@ -98,8 +98,8 @@ class ExchangerProviderPluginTest extends CommerceKernelTestBase {
   public function testImportCrossSync() {
     $this->test->import();
     $rates = $this->container->get('commerce_exchanger.calculate')->getExchangeRates();
-    $this->assertEqual(1 / 0.13, $rates['HRK']['EUR']['value']);
-    $this->assertEqual(1 / 0.16, $rates['HRK']['USD']['value']);
+    $this->assertEqual(round(1 / 0.13, 6), $rates['HRK']['EUR']['value']);
+    $this->assertEqual(round(1 / 0.16, 6), $rates['HRK']['USD']['value']);
     $this->assertEqual(0.13, $rates['EUR']['HRK']['value']);
     $this->assertEqual(0.16, $rates['USD']['HRK']['value']);
   }

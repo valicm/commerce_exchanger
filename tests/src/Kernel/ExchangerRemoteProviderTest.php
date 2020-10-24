@@ -81,7 +81,7 @@ class ExchangerRemoteProviderTest extends CommerceKernelTestBase {
     $this->assertTrue($rates->isTransform());
     $this->assertCount(3, $rates->getCurrencies());
     $this->assertNotEqual($definition['rates']['EUR'], $rates->getRates()['EUR']);
-    $this->assertEqual(1 / 7.55, $rates->getRates()['EUR']);
+    $this->assertEqual(round(1 / 7.55, 6), $rates->getRates()['EUR']);
     $this->assertEqual(2, count($rates->getRates()));
   }
 
