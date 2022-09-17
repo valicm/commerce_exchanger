@@ -6,12 +6,12 @@ use Drupal\Component\Serialization\Json;
 use GuzzleHttp\RequestOptions;
 
 /**
- * Provides the transferwise.com exchange rates.
+ * Provides the wise.com exchange rates.
  *
  * @CommerceExchangerProvider(
  *   id = "transferwise",
- *   label = "TransferWise",
- *   display_label = "TransferWise",
+ *   label = "Wise",
+ *   display_label = "Wise",
  *   historical_rates = TRUE,
  *   enterprise = TRUE,
  *   api_key = TRUE,
@@ -24,7 +24,10 @@ class TransferWiseExchanger extends ExchangerProviderRemoteBase {
    * {@inheritdoc}
    */
   public function apiUrl() {
-    return 'https://api.transferwise.com/v1/rates';
+    if ($this->getMode() === 'test') {
+      return 'https://api.sandbox.transferwise.tech/v1/rates';
+    }
+    return 'https://api.wise.com/v1/rates';
   }
 
   /**
