@@ -50,7 +50,7 @@ class CommerceExchangerTest extends CommerceWebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp() :void {
     parent::setUp();
 
     // Add additional currency.
@@ -140,7 +140,7 @@ class CommerceExchangerTest extends CommerceWebDriverTestBase {
     $this->getSession()->getPage()->clickLink('Run import');
 
     $price_test = $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceHrk, 'USD');
-    $this->assertNotEqual($price_test->getNumber(), '100.00');
+    $this->assertNotEquals($price_test->getNumber(), '100.00');
 
     $this->drupalGet('admin/commerce/config/exchange-rates/' . $exchange_rates->id() . '/edit');
 
@@ -154,10 +154,10 @@ class CommerceExchangerTest extends CommerceWebDriverTestBase {
     $this->submitForm($edit, 'Save');
 
     $exchange_rates = ExchangeRates::load('ecb');
-    $this->assertEqual($edit['label'], $exchange_rates->label());
-    $this->assertNotEqual($edit['plugin'], $exchange_rates->getPluginId());
-    $this->assertEqual($edit['status'], $exchange_rates->status());
-    $this->assertNotEqual($edit['configuration[ecb][enterprise]'], $exchange_rates->getPluginConfiguration()['enterprise']);
+    $this->assertEquals($edit['label'], $exchange_rates->label());
+    $this->assertNotEquals($edit['plugin'], $exchange_rates->getPluginId());
+    $this->assertEquals($edit['status'], $exchange_rates->status());
+    $this->assertNotEquals($edit['configuration[ecb][enterprise]'], $exchange_rates->getPluginConfiguration()['enterprise']);
   }
 
   /**

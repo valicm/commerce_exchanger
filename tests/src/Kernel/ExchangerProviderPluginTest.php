@@ -38,7 +38,7 @@ class ExchangerProviderPluginTest extends CommerceKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp() :void {
     parent::setUp();
 
     $this->installConfig(['commerce_exchanger']);
@@ -79,7 +79,7 @@ class ExchangerProviderPluginTest extends CommerceKernelTestBase {
   public function testPluginSettings() {
     $this->assertTrue($this->test->useCrossSync());
     $this->assertFalse($this->test->isEnterprise());
-    $this->assertEqual('HRK', $this->test->getBaseCurrency());
+    $this->assertEquals('HRK', $this->test->getBaseCurrency());
     $this->assertFalse($this->enterprise->useCrossSync());
     $this->assertTrue($this->enterprise->isEnterprise());
     $this->assertEmpty($this->enterprise->getBaseCurrency());
@@ -98,10 +98,10 @@ class ExchangerProviderPluginTest extends CommerceKernelTestBase {
   public function testImportCrossSync() {
     $this->test->import();
     $rates = $this->container->get('commerce_exchanger.calculate')->getExchangeRates();
-    $this->assertEqual(round(1 / 0.13, 6), $rates['HRK']['EUR']['value']);
-    $this->assertEqual(round(1 / 0.16, 6), $rates['HRK']['USD']['value']);
-    $this->assertEqual(0.13, $rates['EUR']['HRK']['value']);
-    $this->assertEqual(0.16, $rates['USD']['HRK']['value']);
+    $this->assertEquals(round(1 / 0.13, 6), $rates['HRK']['EUR']['value']);
+    $this->assertEquals(round(1 / 0.16, 6), $rates['HRK']['USD']['value']);
+    $this->assertEquals(0.13, $rates['EUR']['HRK']['value']);
+    $this->assertEquals(0.16, $rates['USD']['HRK']['value']);
   }
 
   /**
@@ -122,8 +122,8 @@ class ExchangerProviderPluginTest extends CommerceKernelTestBase {
     $this->enterprise->import();
     $rates = $this->container->get('commerce_exchanger.calculate')->getExchangeRates();
 
-    $this->assertEqual(0.13, $rates['HRK']['EUR']['value']);
-    $this->assertEqual(7.58, $rates['EUR']['HRK']['value']);
+    $this->assertEquals(0.13, $rates['HRK']['EUR']['value']);
+    $this->assertEquals(7.58, $rates['EUR']['HRK']['value']);
   }
 
 }

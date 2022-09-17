@@ -55,7 +55,7 @@ class CommerceExchangerCalculatorTest extends CommerceKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp() :void {
     parent::setUp();
 
     // The parent has already imported USD.
@@ -98,7 +98,7 @@ class CommerceExchangerCalculatorTest extends CommerceKernelTestBase {
    * @covers ::getExchangerId
    */
   public function testExchangerId() {
-    $this->assertEqual($this->exchangerId, $this->container->get('commerce_exchanger.calculate')->getExchangerId());
+    $this->assertEquals($this->exchangerId, $this->container->get('commerce_exchanger.calculate')->getExchangerId());
   }
 
   /**
@@ -140,13 +140,13 @@ class CommerceExchangerCalculatorTest extends CommerceKernelTestBase {
    */
   public function testPriceConversion() {
     $priceHrk = $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceHrk, 'USD');
-    $this->assertEqual(100 * 0.15, $priceHrk->getNumber());
+    $this->assertEquals(100 * 0.15, $priceHrk->getNumber());
 
     $priceUsd = $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceUsd, 'HRK');
-    $this->assertEqual(100 * 6.85, $priceUsd->getNumber());
+    $this->assertEquals(100 * 6.85, $priceUsd->getNumber());
 
     $price_equal = $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceUsd, 'USD');
-    $this->assertEqual(100.00, $price_equal->getNumber());
+    $this->assertEquals(100.00, $price_equal->getNumber());
 
     $this->config($this->exchangerId)->setData([
       'rates' => [
