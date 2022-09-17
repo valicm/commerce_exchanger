@@ -245,6 +245,10 @@ abstract class ExchangerProviderBase extends PluginBase implements ExchangerProv
           2 => t('12 hours'),
           3 => t('8 hours'),
           4 => t('6 hours'),
+          6 => t('4 hours'),
+          8 => t('3 hours'),
+          12 => t('2 hours'),
+          24 => t('1 hour')
         ],
         '#default_value' => $definition['refresh_once'] ?? $this->configuration['cron'],
         '#disabled' => $definition['refresh_once'],
