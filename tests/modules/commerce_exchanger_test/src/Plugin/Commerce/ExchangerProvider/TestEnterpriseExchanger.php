@@ -30,25 +30,17 @@ class TestEnterpriseExchanger extends ExchangerProviderRemoteBase {
    */
   public function getRemoteData($base_currency = NULL) {
     $data = [
-      'HRK' => [
-        'EUR' => 0.13,
-        'USD' => 0.16,
-        'AUD' => 0.22,
-      ],
       'EUR' => [
-        'AUD' => 1.66,
-        'HRK' => 7.58,
-        'USD' => 1.19,
+        'AUD' => 1.659999,
+        'USD' => 1.190000,
       ],
       'USD' => [
-        'AUD' => 1.40,
-        'HRK' => 6.39,
-        'EUR' => 0.84,
+        'AUD' => 1.394957,
+        'EUR' => 0.840336,
       ],
       'AUD' => [
-        'EUR' => 0.60,
-        'HRK' => 4.56,
-        'USD' => 0.71,
+        'EUR' => 0.602409,
+        'USD' => 0.716867,
       ],
     ];
 

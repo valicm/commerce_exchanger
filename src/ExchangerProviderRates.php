@@ -2,6 +2,8 @@
 
 namespace Drupal\commerce_exchanger;
 
+use Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider\ExchangerProviderRemoteInterface;
+
 /**
  * Represents remote exchange rates data with base currency.
  *
@@ -77,7 +79,7 @@ class ExchangerProviderRates {
         continue;
       }
 
-      $definition['rates'][$currency] = round($this->transform ? 1 / $rate: $rate, 6);
+      $definition['rates'][$currency] = round($this->transform ? 1 / $rate : $rate, ExchangerProviderRemoteInterface::EXCHANGER_ROUND_PRECISION);
     }
 
     $this->rates = $definition['rates'];

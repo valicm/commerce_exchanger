@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce_exchanger\Kernel;
 
 use Drupal\commerce_exchanger\Entity\ExchangeRates;
+use Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider\ExchangerProviderRemoteInterface;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
@@ -45,17 +46,17 @@ class ExchangerProviderPluginTest extends CommerceKernelTestBase {
 
     // The parent has already imported USD.
     $currency_importer = $this->container->get('commerce_price.currency_importer');
-    $currency_importer->import('HRK');
+    $currency_importer->import('AUD');
     $currency_importer->import('EUR');
 
-    $hnb_entity = ExchangeRates::create([
+    $exchange_entity = ExchangeRates::create([
       'id' => 'test',
       'label' => 'Test',
       'plugin' => 'test',
     ]);
-    $hnb_entity->save();
+    $exchange_entity->save();
 
-    $this->test = $hnb_entity->getPlugin();
+    $this->test = $exchange_entity->getPlugin();
 
     $fixer_entity = ExchangeRates::create([
       'id' => 'enterprise',
@@ -79,7 +80,7 @@ class ExchangerProviderPluginTest extends CommerceKernelTestBase {
   public function testPluginSettings() {
     $this->assertTrue($this->test->useCrossSync());
     $this->assertFalse($this->test->isEnterprise());
-    $this->assertEquals('HRK', $this->test->getBaseCurrency());
+    $this->assertEquals('EUR', $this->test->getBaseCurrency());
     $this->assertFalse($this->enterprise->useCrossSync());
     $this->assertTrue($this->enterprise->isEnterprise());
     $this->assertEmpty($this->enterprise->getBaseCurrency());
@@ -98,10 +99,10 @@ class ExchangerProviderPluginTest extends CommerceKernelTestBase {
   public function testImportCrossSync() {
     $this->test->import();
     $rates = $this->container->get('commerce_exchanger.calculate')->getExchangeRates();
-    $this->assertEquals(round(1 / 0.13, 6), $rates['HRK']['EUR']['value']);
-    $this->assertEquals(round(1 / 0.16, 6), $rates['HRK']['USD']['value']);
-    $this->assertEquals(0.13, $rates['EUR']['HRK']['value']);
-    $this->assertEquals(0.16, $rates['USD']['HRK']['value']);
+    $this->assertEquals(round(1 / 1.659999, ExchangerProviderRemoteInterface::EXCHANGER_ROUND_PRECISION), $rates['EUR']['AUD']['value']);
+    $this->assertEquals(round(1 / 1.19, ExchangerProviderRemoteInterface::EXCHANGER_ROUND_PRECISION), $rates['EUR']['USD']['value']);
+    $this->assertEquals(1.659999, $rates['AUD']['EUR']['value']);
+    $this->assertEquals(1.19, $rates['USD']['EUR']['value']);
   }
 
   /**
@@ -122,8 +123,8 @@ class ExchangerProviderPluginTest extends CommerceKernelTestBase {
     $this->enterprise->import();
     $rates = $this->container->get('commerce_exchanger.calculate')->getExchangeRates();
 
-    $this->assertEquals(0.13, $rates['HRK']['EUR']['value']);
-    $this->assertEquals(7.58, $rates['EUR']['HRK']['value']);
+    $this->assertEquals(1.19, $rates['EUR']['USD']['value']);
+    $this->assertEquals(0.840336, $rates['USD']['EUR']['value']);
   }
 
 }

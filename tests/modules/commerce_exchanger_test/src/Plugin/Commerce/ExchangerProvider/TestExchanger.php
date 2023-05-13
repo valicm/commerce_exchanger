@@ -12,7 +12,7 @@ use Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider\ExchangerProvide
  *   label = "Test",
  *   display_label = "Test",
  *   historical_rates = TRUE,
- *   base_currency = "HRK",
+ *   base_currency = "EUR",
  *   refresh_once = TRUE,
  *   transform_rates = TRUE,
  * )
@@ -31,9 +31,8 @@ class TestExchanger extends ExchangerProviderRemoteBase {
    */
   public function getRemoteData($base_currency = NULL) {
     return [
-      'EUR' => 0.13,
-      'USD' => 0.16,
-      'AUD' => 0.22,
+      'USD' => 1.19,
+      'AUD' => 1.66,
     ];
   }
 

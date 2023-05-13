@@ -16,11 +16,11 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 class CommerceExchangerCalculatorTest extends CommerceKernelTestBase {
 
   /**
-   * Price in HRK currency.
+   * Price in EUR currency.
    *
    * @var \Drupal\commerce_price\Price
    */
-  protected $priceHrk;
+  protected $priceEur;
 
   /**
    * Price in USD currency.
@@ -60,9 +60,9 @@ class CommerceExchangerCalculatorTest extends CommerceKernelTestBase {
 
     // The parent has already imported USD.
     $currency_importer = $this->container->get('commerce_price.currency_importer');
-    $currency_importer->import('HRK');
+    $currency_importer->import('EUR');
 
-    $this->priceHrk = new Price('100', 'HRK');
+    $this->priceEur = new Price('100', 'EUR');
     $this->priceUsd = new Price('100', 'USD');
 
     $exchanger = ExchangeRates::create([
@@ -78,15 +78,15 @@ class CommerceExchangerCalculatorTest extends CommerceKernelTestBase {
 
     $this->config($this->exchangerId)->setData([
       'rates' => [
-        'HRK' => [
+        'EUR' => [
           'USD' => [
-            'value' => 0.15,
+            'value' => 1.19,
             'sync' => 0,
           ],
         ],
         'USD' => [
-          'HRK' => [
-            'value' => 6.85,
+          'EUR' => [
+            'value' => 0.84,
             'sync' => 0,
           ],
         ],
@@ -112,17 +112,17 @@ class CommerceExchangerCalculatorTest extends CommerceKernelTestBase {
     $this->assertEmpty($this->container->get('commerce_exchanger.calculate')->getExchangeRates());
 
     $this->expectException(ExchangeRatesDataMismatchException::class);
-    $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceUsd, 'HRK');
+    $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceUsd, 'EUR');
 
     $this->expectException(ExchangeRatesDataMismatchException::class);
-    $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceHrk, 'USD');
+    $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceEur, 'USD');
   }
 
   /**
    * @covers ::getExchangeRates
    */
   public function testExchangeRates() {
-    $this->assertArrayHasKey('HRK', $this->container->get('commerce_exchanger.calculate')->getExchangeRates());
+    $this->assertArrayHasKey('EUR', $this->container->get('commerce_exchanger.calculate')->getExchangeRates());
     $this->assertArrayHasKey('USD', $this->container->get('commerce_exchanger.calculate')->getExchangeRates());
   }
 
@@ -139,25 +139,25 @@ class CommerceExchangerCalculatorTest extends CommerceKernelTestBase {
    * @covers ::priceConversion
    */
   public function testPriceConversion() {
-    $priceHrk = $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceHrk, 'USD');
-    $this->assertEquals(100 * 0.15, $priceHrk->getNumber());
+    $priceEur = $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceEur, 'USD');
+    $this->assertEquals(100 * 1.19, $priceEur->getNumber());
 
-    $priceUsd = $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceUsd, 'HRK');
-    $this->assertEquals(100 * 6.85, $priceUsd->getNumber());
+    $priceUsd = $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceUsd, 'EUR');
+    $this->assertEquals(100 * 0.84, $priceUsd->getNumber());
 
     $price_equal = $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceUsd, 'USD');
     $this->assertEquals(100.00, $price_equal->getNumber());
 
     $this->config($this->exchangerId)->setData([
       'rates' => [
-        'HRK' => [
+        'EUR' => [
           'USD' => [
             'value' => 0,
             'sync' => 0,
           ],
         ],
         'USD' => [
-          'HRK' => [
+          'EUR' => [
             'value' => '0',
             'sync' => 0,
           ],
@@ -166,10 +166,10 @@ class CommerceExchangerCalculatorTest extends CommerceKernelTestBase {
     ])->save();
 
     $this->expectException(ExchangeRatesDataMismatchException::class);
-    $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceUsd, 'HRK');
+    $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceUsd, 'EUR');
 
     $this->expectException(ExchangeRatesDataMismatchException::class);
-    $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceHrk, 'USD');
+    $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceEur, 'USD');
 
   }
 
@@ -180,7 +180,7 @@ class CommerceExchangerCalculatorTest extends CommerceKernelTestBase {
     $this->exchanger->setStatus(FALSE);
     $this->exchanger->save();
     $this->expectException(ExchangeRatesDataMismatchException::class);
-    $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceHrk, 'USD');
+    $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceEur, 'USD');
   }
 
 }

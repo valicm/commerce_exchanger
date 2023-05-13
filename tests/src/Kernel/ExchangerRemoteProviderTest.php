@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce_exchanger\Kernel;
 
 use Drupal\commerce_exchanger\ExchangerProviderRates;
+use Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider\ExchangerProviderRemoteInterface;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
@@ -81,7 +82,7 @@ class ExchangerRemoteProviderTest extends CommerceKernelTestBase {
     $this->assertTrue($rates->isTransform());
     $this->assertCount(3, $rates->getCurrencies());
     $this->assertNotEquals($definition['rates']['EUR'], $rates->getRates()['EUR']);
-    $this->assertEquals(round(1 / 7.55, 6), $rates->getRates()['EUR']);
+    $this->assertEquals(round(1 / 7.55, ExchangerProviderRemoteInterface::EXCHANGER_ROUND_PRECISION), $rates->getRates()['EUR']);
     $this->assertEquals(2, count($rates->getRates()));
   }
 

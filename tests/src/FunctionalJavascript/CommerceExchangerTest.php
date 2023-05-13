@@ -17,11 +17,11 @@ use Drupal\Tests\commerce\FunctionalJavascript\CommerceWebDriverTestBase;
 class CommerceExchangerTest extends CommerceWebDriverTestBase {
 
   /**
-   * Price in HRK currency.
+   * Price in EUR currency.
    *
    * @var \Drupal\commerce_price\Price
    */
-  protected $priceHrk;
+  protected $priceEur;
 
   /**
    * Price in USD currency.
@@ -56,9 +56,9 @@ class CommerceExchangerTest extends CommerceWebDriverTestBase {
     // Add additional currency.
     // The parent has already imported USD.
     $currency_importer = $this->container->get('commerce_price.currency_importer');
-    $currency_importer->import('HRK');
+    $currency_importer->import('EUR');
 
-    $this->priceHrk = new Price('100', 'HRK');
+    $this->priceEur = new Price('100', 'EUR');
     $this->priceUsd = new Price('100', 'USD');
   }
 
@@ -95,17 +95,17 @@ class CommerceExchangerTest extends CommerceWebDriverTestBase {
     $rates = $this->config($exchange_rates->getExchangerConfigName())->get('rates');
 
     $this->assertIsArray($rates);
-    $this->assertIsArray($rates['USD']['HRK']);
-    $this->assertEquals('0', $rates['USD']['HRK']['value']);
+    $this->assertIsArray($rates['USD']['EUR']);
+    $this->assertEquals('0', $rates['USD']['EUR']['value']);
 
     $this->drupalGet('admin/commerce/config/exchange-rates');
     $this->getSession()->getPage()->clickLink('Run import');
 
     $rates = $this->config($exchange_rates->getExchangerConfigName())->get('rates');
     $this->assertIsArray($rates);
-    $this->assertIsArray($rates['USD']['HRK']);
-    $this->assertIsNotString($rates['USD']['HRK']['value']);
-    $this->assertIsFloat($rates['USD']['HRK']['value']);
+    $this->assertIsArray($rates['USD']['EUR']);
+    $this->assertIsNotString($rates['USD']['EUR']['value']);
+    $this->assertIsFloat($rates['USD']['EUR']['value']);
 
   }
 
@@ -113,8 +113,8 @@ class CommerceExchangerTest extends CommerceWebDriverTestBase {
    * Tests adding a exchange rate without enough currencies.
    */
   public function testCommerceExchangerCreationDisabled() {
-    $hrk = Currency::load('HRK');
-    $hrk->delete();
+    $eur = Currency::load('EUR');
+    $eur->delete();
     $this->drupalGet('admin/commerce/config/exchange-rates');
     $this->getSession()->getPage()->clickLink('Add Exchange rates');
     $this->assertSession()->pageTextContains(t('Minimum of two currencies needs to be enabled, to be able to add exchange rates'));
@@ -133,13 +133,13 @@ class CommerceExchangerTest extends CommerceWebDriverTestBase {
 
     // There is no rates upon creation.
     $this->expectException(ExchangeRatesDataMismatchException::class);
-    $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceHrk, 'USD');
+    $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceEur, 'USD');
 
     // Import rates.
     $this->drupalGet('admin/commerce/config/exchange-rates');
     $this->getSession()->getPage()->clickLink('Run import');
 
-    $price_test = $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceHrk, 'USD');
+    $price_test = $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceEur, 'USD');
     $this->assertNotEquals($price_test->getNumber(), '100.00');
 
     $this->drupalGet('admin/commerce/config/exchange-rates/' . $exchange_rates->id() . '/edit');
