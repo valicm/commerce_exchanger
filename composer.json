@@ -9,8 +9,7 @@
     }
     ,
     "require-dev": {
-        "ext-simplexml": "*",
-        "roave/security-advisories": "dev-master"
+        "ext-simplexml": "*"
     },
     "minimum-stability": "dev"
 }
