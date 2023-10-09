@@ -2,11 +2,11 @@
 
 namespace Drupal\commerce_exchanger;
 
+use Drupal\commerce_exchanger\Annotation\CommerceExchangerProvider;
 use Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider\ExchangerProviderInterface;
-use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\commerce_exchanger\Annotation\CommerceExchangerProvider;
+use Drupal\Core\Plugin\DefaultPluginManager;
 
 /**
  * Provides the Commerce exchange rates provider plugin manager.

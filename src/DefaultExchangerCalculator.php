@@ -2,6 +2,9 @@
 
 namespace Drupal\commerce_exchanger;
 
+/**
+ * {@inheritdoc}
+ */
 class DefaultExchangerCalculator extends AbstractExchangerCalculator {
 
   /**

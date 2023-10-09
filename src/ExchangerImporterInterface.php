@@ -3,7 +3,7 @@
 namespace Drupal\commerce_exchanger;
 
 /**
- * Interface ExchangerImporterInterface.
+ * Main interface for importing rates.
  *
  * @package Drupal\commerce_exchanger
  */

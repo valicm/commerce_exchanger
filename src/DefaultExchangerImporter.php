@@ -8,9 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\State\StateInterface;
 
 /**
- * Class DefaultExchangerImporter.
- *
- * @package Drupal\commerce_exchanger
+ * {@inheritdoc}
  */
 class DefaultExchangerImporter implements ExchangerImporterInterface {
 

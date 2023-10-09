@@ -2,8 +2,6 @@
 
 namespace Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider;
 
-use \SimpleXMLElement;
-
 /**
  * Provides EuropeanCentralBank.
  *
@@ -36,7 +34,7 @@ class EuropeanCentralBankExchanger extends ExchangerProviderRemoteBase {
     if ($request) {
 
       try {
-        $xml = new SimpleXMLElement($request);
+        $xml = new \SimpleXMLElement($request);
       }
       catch (\Exception $e) {
         $this->logger->error($e->getMessage());

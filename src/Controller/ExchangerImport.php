@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
- * Class ExchangerImport.
+ * Controller for manually triggering exchange rates import job.
  *
  * @package Drupal\commerce_exchanger\Controller
  */

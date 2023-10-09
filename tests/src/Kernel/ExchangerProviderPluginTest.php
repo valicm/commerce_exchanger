@@ -75,7 +75,7 @@ class ExchangerProviderPluginTest extends CommerceKernelTestBase {
    * Test generic settings for plugins.
    *
    * ::@covers ::useCrossSync
-   * ::@covers ::isEnterprise
+   * ::@covers ::isEnterprise.
    */
   public function testPluginSettings() {
     $this->assertTrue($this->test->useCrossSync());
@@ -94,7 +94,7 @@ class ExchangerProviderPluginTest extends CommerceKernelTestBase {
    * ::@covers ::importCrossSync
    * ::@covers ::processRemoteData
    * ::@covers ::crossSyncCalculate
-   * ::@covers ::mapExchangeRates
+   * ::@covers ::mapExchangeRates.
    */
   public function testImportCrossSync() {
     $this->test->import();
@@ -112,7 +112,7 @@ class ExchangerProviderPluginTest extends CommerceKernelTestBase {
    * ::@covers ::buildExchangeRates
    * ::@covers ::mapExchangeRates
    * ::@covers ::processRemoteData
-   * ::@covers ::importEnterprise
+   * ::@covers ::importEnterprise.
    */
   public function testImportEnterprise() {
     // We need to disable test which is loaded first in default calculator.
