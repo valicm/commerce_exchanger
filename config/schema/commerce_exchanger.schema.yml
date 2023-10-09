@@ -82,3 +82,17 @@ commerce_exchanger.latest_exchange_rates.*:
             sync:
               type: integer
               label: 'Sync'
+
+field.formatter.settings.commerce_price_exchanger:
+  type: mapping
+  label: 'Exchanger price formatter settings'
+  mapping:
+    strip_trailing_zeroes:
+      type: boolean
+      label: 'Strip trailing zeroes after the decimal point'
+    currency_display:
+      type: string
+      label: 'Currency display'
+    target_currency:
+      type: string
+      label: 'Target currency'
