@@ -64,8 +64,9 @@ interface ExchangerProviderRemoteInterface {
   public function getAuthData();
 
   /**
-   * Determine if rates provided by provider needs to be transformed
-   * in a required rate ratio based on base currency.
+   * Determine if rates provided by provider needs to be transformed.
+   *
+   * Transforming in a required rate ratio based on base currency.
    *
    * @return bool
    *   Return true if transfrom rates is ON.

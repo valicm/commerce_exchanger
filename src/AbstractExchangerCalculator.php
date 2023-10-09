@@ -9,7 +9,7 @@ use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
- * Class AbstractExchangerCalculator.
+ * Base class for exchanger calculator.
  *
  * @package Drupal\commerce_exchanger
  */
