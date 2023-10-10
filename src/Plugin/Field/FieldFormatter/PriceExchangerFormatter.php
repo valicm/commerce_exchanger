@@ -4,6 +4,7 @@ namespace Drupal\commerce_exchanger\Plugin\Field\FieldFormatter;
 
 use CommerceGuys\Intl\Formatter\CurrencyFormatterInterface;
 use Drupal\commerce_exchanger\ExchangerCalculatorInterface;
+use Drupal\commerce_exchanger\ExchangerManagerInterface;
 use Drupal\commerce_price\Plugin\Field\FieldFormatter\PriceDefaultFormatter;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -140,6 +141,9 @@ class PriceExchangerFormatter extends PriceDefaultFormatter {
           'contexts' => [
             'languages:' . LanguageInterface::TYPE_INTERFACE,
             'country',
+          ],
+          'tags' => [
+            ExchangerManagerInterface::EXCHANGER_RATES_CACHE_TAG,
           ],
         ],
       ];

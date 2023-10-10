@@ -3,6 +3,7 @@
 namespace Drupal\commerce_exchanger;
 
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Connection;
 
 /**
@@ -41,7 +42,7 @@ class ExchangerManager implements ExchangerManagerInterface {
    * {@inheritdoc}
    */
   public function getLatest($exchanger_id): array {
-    $results = $this->database->select(self::EXCHANGER_LATEST_RATES, 'e')
+    $results = $this->database->select(ExchangerManagerInterface::EXCHANGER_LATEST_RATES, 'e')
       ->fields('e', ['source', 'target', 'value', 'manual'])
       ->condition('e.exchanger', $exchanger_id)
       ->execute()->fetchAll();
@@ -62,7 +63,7 @@ class ExchangerManager implements ExchangerManagerInterface {
    * {@inheritdoc}
    */
   public function setLatest($exchanger_id, array $rates): void {
-    $query = $this->database->insert(self::EXCHANGER_LATEST_RATES)
+    $query = $this->database->insert(ExchangerManagerInterface::EXCHANGER_LATEST_RATES)
       ->fields(['exchanger', 'source', 'target', 'value', 'timestamp', 'manual']);
 
     $time = $this->time->getCurrentTime();
@@ -80,15 +81,18 @@ class ExchangerManager implements ExchangerManagerInterface {
       }
     }
     // Delete old records, in case we don't hold some currencies anymore.
-    $this->database->delete(self::EXCHANGER_LATEST_RATES)->condition('exchanger', $exchanger_id)->execute();
+    $this->database->delete(ExchangerManagerInterface::EXCHANGER_LATEST_RATES)->condition('exchanger', $exchanger_id)->execute();
     $query->execute();
+
+    // Invalidate custom cache tag used on field formatter.
+    Cache::invalidateTags([ExchangerManagerInterface::EXCHANGER_RATES_CACHE_TAG]);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getHistorical($exchanger_id, string $date = NULL): array {
-    $results = $this->database->select(self::EXCHANGER_HISTORICAL_RATES, 'e')
+    $results = $this->database->select(ExchangerManagerInterface::EXCHANGER_HISTORICAL_RATES, 'e')
       ->fields('e', ['source', 'target', 'value', 'date'])
       ->condition('e.exchanger', $exchanger_id);
 
@@ -120,7 +124,7 @@ class ExchangerManager implements ExchangerManagerInterface {
 
     foreach ($rates as $source => $rate) {
       foreach ($rate as $target => $values) {
-        $query = $this->database->merge(self::EXCHANGER_HISTORICAL_RATES);
+        $query = $this->database->merge(ExchangerManagerInterface::EXCHANGER_HISTORICAL_RATES);
         $query->keys([
           'exchanger' => $exchanger_id,
           'source' => $source,

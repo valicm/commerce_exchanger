@@ -4,6 +4,7 @@ CONTENTS OF THIS FILE
 * Requirements
 * Installation
 * Configuration
+* Custom exchange rates
 * Plugin system
 * Maintainers
 
@@ -15,10 +16,11 @@ Currency exchange rates module for Drupal Commerce 2.
 Features
 1. Manual or remote exchange rates sources.
 2. Built for Commerce 2
-3. Separate config yml files for exchange rates from the plugin definition.
+3. Exchange rates stored in dedicated database table.
 4. Provide default price conversion calculator service.
 5. Plugin based system.
 6. Integration with Commerce Currency Resolver module
+7. Store rates in historical table per each day.
 
 Builtin exchange rates plugins are:
 1. Manual plugin
@@ -46,6 +48,19 @@ CONFIGURATION
        module.
     2. Navigate to Home > Administration > Commerce > Configuration
                    > Exchange rates.
+
+CUSTOM EXCHANGE RATES
+--------------
+For any provider (manual or remote) you can trough UI
+overwrite any ratio for any currency. Once you enable manually
+entered value, this one is going to be ignored from regular sync.
+
+If you want to directly fill database table, skipping default cron,
+you can use service `commerce_exchanger.manager` and method
+`\Drupal\commerce_exchanger\ExchangerManager::setLatest`.
+
+Even it's advisable that you write your own plugin if you need additional
+customization.
 
 PLUGIN SYSTEM
 --------------

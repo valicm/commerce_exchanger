@@ -11,6 +11,8 @@ interface ExchangerManagerInterface {
 
   public const EXCHANGER_HISTORICAL_RATES = 'commerce_exchanger_historical_rates';
 
+  public const EXCHANGER_RATES_CACHE_TAG = 'commerce_exchanger_latest';
+
   /**
    * Fetch latest rates per exchanger id.
    *
