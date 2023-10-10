@@ -11,7 +11,6 @@ use Drupal\Component\Serialization\Json;
  *   id = "currencylayer",
  *   label = "Currencylayer",
  *   display_label = "currencylayer.com",
- *   historical_rates = TRUE,
  *   enterprise = TRUE,
  *   api_key= TRUE,
  * )

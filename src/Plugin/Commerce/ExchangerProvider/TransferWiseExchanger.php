@@ -12,7 +12,6 @@ use GuzzleHttp\RequestOptions;
  *   id = "transferwise",
  *   label = "Wise",
  *   display_label = "Wise",
- *   historical_rates = TRUE,
  *   enterprise = TRUE,
  *   api_key = TRUE,
  *   modes = TRUE,

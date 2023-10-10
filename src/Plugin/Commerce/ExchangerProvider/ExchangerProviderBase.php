@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider;
 
-use Drupal\commerce_exchanger\Entity\ExchangeRatesInterface;
+use Drupal\commerce_exchanger\ExchangerManagerInterface;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Config\ConfigFactory;
@@ -54,11 +54,20 @@ abstract class ExchangerProviderBase extends PluginBase implements ExchangerProv
   protected $currencies;
 
   /**
-   * Parent entity if present.
+   * The exchanger manager.
    *
-   * @var mixed
+   * @var \Drupal\commerce_exchanger\ExchangerManagerInterface
    */
-  private $entityId;
+  protected $exchangerManager;
+
+  /**
+   * The parent config entity id.
+   *
+   * Not available while the plugin is being configured.
+   *
+   * @var string
+   */
+  protected $entityId;
 
   /**
    * Constructs a new ExchangeProvider object.
@@ -77,13 +86,16 @@ abstract class ExchangerProviderBase extends PluginBase implements ExchangerProv
    *   Config factory.
    * @param \Psr\Log\LoggerInterface $logger_channel
    *   Logger.
+   * @param \Drupal\commerce_exchanger\ExchangerManagerInterface $exchanger_manager
+   *   The exchange manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, ClientFactory $http_client_factory, ConfigFactory $config_factory, LoggerInterface $logger_channel) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, ClientFactory $http_client_factory, ConfigFactory $config_factory, LoggerInterface $logger_channel, ExchangerManagerInterface $exchanger_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->currencyStorage = $entity_type_manager->getStorage('commerce_currency');
     $this->httpClientFactory = $http_client_factory;
     $this->configFactory = $config_factory;
     $this->logger = $logger_channel;
+    $this->exchangerManager = $exchanger_manager;
 
     if (array_key_exists('_entity_id', $configuration)) {
       $this->entityId = $configuration['_entity_id'];
@@ -105,7 +117,8 @@ abstract class ExchangerProviderBase extends PluginBase implements ExchangerProv
       $container->get('entity_type.manager'),
       $container->get('http_client_factory'),
       $container->get('config.factory'),
-      $container->get('logger.factory')->get('commerce_exchanger')
+      $container->get('logger.factory')->get('commerce_exchanger'),
+      $container->get('commerce_exchanger.manager')
     );
   }
 
@@ -280,6 +293,13 @@ abstract class ExchangerProviderBase extends PluginBase implements ExchangerProv
       '#default_value' => $this->configuration['demo_amount'] ?? 100,
     ];
 
+    $form['historical_rates'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Historical rates'),
+      '#description' => t('Store imported rates per each import or entity save'),
+      '#default_value' => $this->configuration['historical_rates'] ?? FALSE,
+    ];
+
     return $form;
   }
 
@@ -322,13 +342,6 @@ abstract class ExchangerProviderBase extends PluginBase implements ExchangerProv
     }
 
     return $currencies;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getConfigName() {
-    return ExchangeRatesInterface::COMMERCE_EXCHANGER_IMPORT . $this->entityId;
   }
 
 }

@@ -46,7 +46,7 @@ class ExchangerProviderRates {
    *   The definition.
    */
   public function __construct(array $definition) {
-    foreach (['base'] as $required_property) {
+    foreach (['base', 'rates'] as $required_property) {
       if (empty($definition[$required_property])) {
         throw new \InvalidArgumentException(sprintf('Missing required property "%s".', $required_property));
       }

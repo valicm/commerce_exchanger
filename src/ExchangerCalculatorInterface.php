@@ -35,8 +35,8 @@ interface ExchangerCalculatorInterface {
   /**
    * Return configuration file of active provider or NULL.
    *
-   * @return string|null
-   *   Return provider.
+   * @return string
+   *   Return provider id.
    */
   public function getExchangerId();
 

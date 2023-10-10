@@ -14,7 +14,7 @@ class DefaultExchangerCalculator extends AbstractExchangerCalculator {
     // Return the first one.
     foreach ($this->providers as $provider) {
       if ($provider->status()) {
-        return $provider->getExchangerConfigName();
+        return $provider->id();
       }
     }
 

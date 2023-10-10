@@ -11,7 +11,6 @@ use Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider\ExchangerProvide
  *   id = "test",
  *   label = "Test",
  *   display_label = "Test",
- *   historical_rates = TRUE,
  *   base_currency = "EUR",
  *   refresh_once = TRUE,
  *   transform_rates = TRUE,
@@ -30,9 +29,10 @@ class TestExchanger extends ExchangerProviderRemoteBase {
    * {@inheritdoc}
    */
   public function getRemoteData($base_currency = NULL) {
+    // Reverse values, used to test transform_rates.
     return [
-      'USD' => 1.19,
-      'AUD' => 1.66,
+      'USD' => 0.840336,
+      'AUD' => 0.602409,
     ];
   }
 

@@ -37,6 +37,13 @@ class CommerceExchangerCalculatorTest extends CommerceKernelTestBase {
   protected $exchanger;
 
   /**
+   * The exchanger manager.
+   *
+   * @var \Drupal\commerce_exchanger\ExchangerManagerInterface
+   */
+  protected $exchangerManager;
+
+  /**
    * Configuration file name.
    *
    * @var string
@@ -58,6 +65,8 @@ class CommerceExchangerCalculatorTest extends CommerceKernelTestBase {
   protected function setUp() :void {
     parent::setUp();
 
+    $this->installSchema('commerce_exchanger', ['commerce_exchanger_latest_rates']);
+
     // The parent has already imported USD.
     $currency_importer = $this->container->get('commerce_price.currency_importer');
     $currency_importer->import('EUR');
@@ -74,24 +83,24 @@ class CommerceExchangerCalculatorTest extends CommerceKernelTestBase {
     $exchanger->save();
 
     $this->exchanger = $exchanger;
-    $this->exchangerId = $exchanger->getExchangerConfigName();
+    $this->exchangerId = $exchanger->id();
 
-    $this->config($this->exchangerId)->setData([
-      'rates' => [
-        'EUR' => [
-          'USD' => [
-            'value' => 1.19,
-            'sync' => 0,
-          ],
-        ],
+    $this->exchangerManager = $this->container->get('commerce_exchanger.manager');
+
+    $this->exchangerManager->setLatest($this->exchangerId, [
+      'EUR' => [
         'USD' => [
-          'EUR' => [
-            'value' => 0.84,
-            'sync' => 0,
-          ],
+          'value' => 1.19,
+          'manual' => 0,
         ],
       ],
-    ])->save();
+      'USD' => [
+        'EUR' => [
+          'value' => 0.84,
+          'manual' => 0,
+        ],
+      ],
+    ]);
   }
 
   /**
@@ -109,6 +118,7 @@ class CommerceExchangerCalculatorTest extends CommerceKernelTestBase {
     $this->exchanger->save();
     $this->assertEmpty($this->container->get('commerce_exchanger.calculate')->getExchangerId());
 
+    $this->expectException(ExchangeRatesDataMismatchException::class);
     $this->assertEmpty($this->container->get('commerce_exchanger.calculate')->getExchangeRates());
 
     $this->expectException(ExchangeRatesDataMismatchException::class);
@@ -132,7 +142,8 @@ class CommerceExchangerCalculatorTest extends CommerceKernelTestBase {
   public function testExchangeRatesEmpty() {
     $this->exchanger->setStatus(FALSE);
     $this->exchanger->save();
-    $this->assertEmpty($this->container->get('commerce_exchanger.calculate')->getExchangeRates());
+    $this->expectException(ExchangeRatesDataMismatchException::class);
+    $this->container->get('commerce_exchanger.calculate')->getExchangeRates();
   }
 
   /**
@@ -148,22 +159,23 @@ class CommerceExchangerCalculatorTest extends CommerceKernelTestBase {
     $price_equal = $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceUsd, 'USD');
     $this->assertEquals(100.00, $price_equal->getNumber());
 
-    $this->config($this->exchangerId)->setData([
-      'rates' => [
-        'EUR' => [
-          'USD' => [
-            'value' => 0,
-            'sync' => 0,
-          ],
-        ],
+    $this->exchangerManager->setLatest($this->exchangerId, [
+      'EUR' => [
         'USD' => [
-          'EUR' => [
-            'value' => '0',
-            'sync' => 0,
-          ],
+          'value' => 0,
+          'manual' => 0,
         ],
       ],
-    ])->save();
+      'USD' => [
+        'EUR' => [
+          'value' => '0',
+          'manual' => 0,
+        ],
+      ],
+    ]);
+
+    // To avoid static cache on price calculator service.
+    $this->container = $this->container->get('kernel')->rebuildContainer();
 
     $this->expectException(ExchangeRatesDataMismatchException::class);
     $this->container->get('commerce_exchanger.calculate')->priceConversion($this->priceUsd, 'EUR');

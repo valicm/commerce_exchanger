@@ -68,13 +68,6 @@ class CommerceExchangerProvider extends Plugin {
   public $enterprise = FALSE;
 
   /**
-   * Define if external provider supports historical rates.
-   *
-   * @var bool
-   */
-  public $historical_rates = FALSE;
-
-  /**
    * Define if external provider refresh currencies only once a day.
    *
    * @var bool

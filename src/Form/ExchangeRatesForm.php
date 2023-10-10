@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_exchanger\Form;
 
+use Drupal\commerce_exchanger\ExchangerManagerInterface;
 use Drupal\commerce_exchanger\ExchangerProviderManager;
 use Drupal\commerce_price\Entity\CurrencyInterface;
 use Drupal\Component\Utility\Html;
@@ -38,6 +39,13 @@ class ExchangeRatesForm extends EntityForm {
   protected $configFactory;
 
   /**
+   * The exchanger manager.
+   *
+   * @var \Drupal\commerce_exchanger\ExchangerManagerInterface
+   */
+  protected $exchangerManager;
+
+  /**
    * Constructs a new ExchangeRatesForm object.
    *
    * @param \Drupal\commerce_exchanger\ExchangerProviderManager $plugin_manager
@@ -46,11 +54,14 @@ class ExchangeRatesForm extends EntityForm {
    *   Currency storage.
    * @param \Drupal\Core\Config\ConfigFactory $config_factory
    *   Configuration managment.
+   * @param \Drupal\commerce_exchanger\ExchangerManagerInterface $exchanger_manager
+   *   The exchange manager.
    */
-  public function __construct(ExchangerProviderManager $plugin_manager, EntityTypeManagerInterface $entity_type_manager, ConfigFactory $config_factory) {
+  public function __construct(ExchangerProviderManager $plugin_manager, EntityTypeManagerInterface $entity_type_manager, ConfigFactory $config_factory, ExchangerManagerInterface $exchanger_manager) {
     $this->pluginManager = $plugin_manager;
     $this->currencyStorage = $entity_type_manager->getStorage('commerce_currency');
     $this->configFactory = $config_factory;
+    $this->exchangerManager = $exchanger_manager;
   }
 
   /**
@@ -60,7 +71,8 @@ class ExchangeRatesForm extends EntityForm {
     return new static(
       $container->get('plugin.manager.commerce_exchanger_provider'),
       $container->get('entity_type.manager'),
-      $container->get('config.factory')
+      $container->get('config.factory'),
+      $container->get('commerce_exchanger.manager')
     );
   }
 
@@ -95,7 +107,7 @@ class ExchangeRatesForm extends EntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
 
-    $exchange_rates = $this->entity;
+    $exchanger = $this->entity;
 
     $plugin_definition = $this->pluginManager->getDefinitions();
 
@@ -103,17 +115,17 @@ class ExchangeRatesForm extends EntityForm {
     asort($plugins);
 
     // Use the first available plugin as the default value.
-    if (!$exchange_rates->getPluginId()) {
+    if (!$exchanger->getPluginId()) {
       $plugin_ids = array_keys($plugins);
       $plugin = reset($plugin_ids);
-      $exchange_rates->setPluginId($plugin);
+      $exchanger->setPluginId($plugin);
     }
 
     // The form state will have a plugin value if #ajax was used.
-    $plugin = $form_state->getValue('plugin', $exchange_rates->getPluginId());
+    $plugin = $form_state->getValue('plugin', $exchanger->getPluginId());
     // Pass the plugin configuration only if the plugin
     // hasn't been changed via #ajax.
-    $plugin_configuration = $exchange_rates->getPluginId() === $plugin ? $exchange_rates->getPluginConfiguration() : [];
+    $plugin_configuration = $exchanger->getPluginId() === $plugin ? $exchanger->getPluginConfiguration() : [];
 
     $wrapper_id = Html::getUniqueId('commerce-exchange-rate-form');
     $form['#prefix'] = '<div id="' . $wrapper_id . '">';
@@ -124,18 +136,18 @@ class ExchangeRatesForm extends EntityForm {
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
       '#maxlength' => 255,
-      '#default_value' => $exchange_rates->label(),
+      '#default_value' => $exchanger->label(),
       '#description' => $this->t('Label for the Exchange rates.'),
       '#required' => TRUE,
     ];
 
     $form['id'] = [
       '#type' => 'machine_name',
-      '#default_value' => $exchange_rates->id(),
+      '#default_value' => $exchanger->id(),
       '#machine_name' => [
         'exists' => '\Drupal\commerce_exchanger\Entity\ExchangeRates::load',
       ],
-      '#disabled' => !$exchange_rates->isNew(),
+      '#disabled' => !$exchanger->isNew(),
     ];
 
     $form['plugin'] = [
@@ -144,7 +156,7 @@ class ExchangeRatesForm extends EntityForm {
       '#options' => $plugins,
       '#default_value' => $plugin,
       '#required' => TRUE,
-      '#disabled' => !$exchange_rates->isNew(),
+      '#disabled' => !$exchanger->isNew(),
       '#ajax' => [
         'callback' => '::ajaxRefresh',
         'wrapper' => $wrapper_id,
@@ -157,11 +169,7 @@ class ExchangeRatesForm extends EntityForm {
       '#default_value' => $plugin_configuration,
     ];
 
-    $data = [];
-
-    if ($existing = $exchange_rates->getExchangerConfigName()) {
-      $data = $this->configFactory->get($existing)->get('rates');
-    }
+    $data = $this->exchangerManager->getLatest($exchanger->id());
 
     // Load currencies.
     $currencies = $this->currencyStorage->loadMultiple();
@@ -174,7 +182,7 @@ class ExchangeRatesForm extends EntityForm {
     ];
 
     // See if plugin is manual. We dont need then flag for manual syncing.
-    $manual_plugin = !empty($plugin_definition[$exchange_rates->getPluginId()]['manual']);
+    $manual_plugin = !empty($plugin_definition[$exchanger->getPluginId()]['manual']);
 
     $demo_amount = $plugin_configuration['demo_amount'] ?? 100;
 
@@ -191,7 +199,7 @@ class ExchangeRatesForm extends EntityForm {
         if ($key !== $subkey) {
 
           $default_rate = $data[$key][$subkey]['value'] ?? '0';
-          $default_sync = $data[$key][$subkey]['sync'] ?? 0;
+          $default_sync = $data[$key][$subkey]['manual'] ?? 0;
 
           // Specific change for manual plugin.
           if ($manual_plugin) {
@@ -228,7 +236,7 @@ class ExchangeRatesForm extends EntityForm {
             ]);
           }
 
-          $form['exchange_rates'][$key][$subkey]['sync'] = [
+          $form['exchange_rates'][$key][$subkey]['manual'] = [
             '#type' => 'checkbox',
             '#title' => $this->t('Manually enter an exchange rate'),
             '#default_value' => $default_sync,
@@ -247,7 +255,7 @@ class ExchangeRatesForm extends EntityForm {
         0 => $this->t('Disabled'),
         1  => $this->t('Enabled'),
       ],
-      '#default_value' => (int) $exchange_rates->status(),
+      '#default_value' => (int) $exchanger->status(),
     ];
 
     return $form;
@@ -266,14 +274,19 @@ class ExchangeRatesForm extends EntityForm {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
-    /** @var \Drupal\commerce_exchanger\Entity\ExchangeRates $exchange */
-    $exchange = $this->entity;
+    /** @var \Drupal\commerce_exchanger\Entity\ExchangeRates $exchanger */
+    $exchanger = $this->entity;
+    $configuration = $form_state->getValue(['configuration']);
+    $exchange_rates = $form_state->getValue(['exchange_rates']);
 
     // Set provider plugin configuration.
-    $exchange->setPluginConfiguration($form_state->getValue(['configuration']));
-
+    $exchanger->setPluginConfiguration($configuration);
     // Set exchange rates and settings.
-    $this->setExchangeRates($form_state->getValue(['exchange_rates']), $this->entity->getExchangerConfigName());
+    $this->exchangerManager->setLatest($exchanger->id(), $exchange_rates);
+
+    if (!empty($configuration['historical_rates'])) {
+      $this->exchangerManager->setHistorical($exchanger->id(), $exchange_rates);
+    }
   }
 
   /**
@@ -285,14 +298,6 @@ class ExchangeRatesForm extends EntityForm {
 
     $this->messenger()->addMessage($this->t('Saved the %label exchange rates.', ['%label' => $this->entity->label()]));
     $form_state->setRedirect('entity.commerce_exchange_rates.collection');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setExchangeRates(array $exchange_rates, string $name) {
-    $config = $this->configFactory->getEditable($name)->setData(['rates' => $exchange_rates]);
-    $config->save();
   }
 
 }

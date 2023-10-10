@@ -61,27 +61,9 @@ commerce_exchanger_provider_configuration:
     transform_rates:
       type: boolean
       label: 'Transform rates'
-
-commerce_exchanger.latest_exchange_rates.*:
-  type: config_object
-  label: 'Exchange rates'
-  mapping:
-    rates:
-      type: sequence
-      label: 'List of currencies'
-      sequence:
-        type: sequence
-        label: 'Currency upon exchanges is based'
-        sequence:
-          type: mapping
-          label: 'Other currencies exchange rates'
-          mapping:
-            value:
-              type: float
-              label: 'Value'
-            sync:
-              type: integer
-              label: 'Sync'
+    historical_rates:
+      type: boolean
+      label: 'Store long-term imported rates'
 
 field.formatter.settings.commerce_price_exchanger:
   type: mapping

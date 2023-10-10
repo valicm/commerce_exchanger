@@ -9,7 +9,6 @@ namespace Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider;
  *   id = "ecb",
  *   label = "European Central Bank",
  *   display_label = "European Central Bank",
- *   historical_rates = TRUE,
  *   base_currency = "EUR",
  *   refresh_once = TRUE,
  * )

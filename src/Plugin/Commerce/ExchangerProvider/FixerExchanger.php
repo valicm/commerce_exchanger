@@ -11,7 +11,6 @@ use Drupal\Component\Serialization\Json;
  *   id = "fixer",
  *   label = "Fixer.io",
  *   display_label = "Fixer.io",
- *   historical_rates = TRUE,
  *   enterprise = TRUE,
  *   api_key= TRUE,
  * )

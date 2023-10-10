@@ -187,7 +187,7 @@ abstract class ExchangerProviderRemoteBase extends ExchangerProviderBase impleme
    */
   protected function mapExchangeRates(ExchangerProviderRates $exchange_rates) {
     // Get current exchange rates.
-    $mapping = $this->configFactory->get($this->getConfigName())->getRawData();
+    $mapping = $this->exchangerManager->getLatest($this->entityId);
 
     $rates = $exchange_rates->getRates();
     $base_currency = $exchange_rates->getBaseCurrency();
@@ -200,9 +200,9 @@ abstract class ExchangerProviderRemoteBase extends ExchangerProviderBase impleme
     foreach ($rates as $currency => $rate) {
       // Skip base currency to map to itself.
       if ($currency !== $base_currency) {
-        if (empty($mapping[$base_currency][$currency]['sync'])) {
+        if (empty($mapping[$base_currency][$currency]['manual'])) {
           $calculated_rates[$base_currency][$currency]['value'] = $rate;
-          $calculated_rates[$base_currency][$currency]['sync'] = $mapping[$base_currency][$currency]['sync'] ?? 0;
+          $calculated_rates[$base_currency][$currency]['manual'] = $mapping[$base_currency][$currency]['manual'] ?? 0;
         }
         else {
           $calculated_rates[$base_currency][$currency] = $mapping[$base_currency][$currency];
@@ -255,12 +255,10 @@ abstract class ExchangerProviderRemoteBase extends ExchangerProviderBase impleme
    */
   public function import() {
     $exchange_rates = $this->buildExchangeRates();
+    $this->exchangerManager->setLatest($this->entityId, $exchange_rates);
 
-    // Write new data.
-    if (!empty($exchange_rates)) {
-      $file = $this->configFactory->getEditable($this->getConfigName());
-      $file->setData(['rates' => $exchange_rates]);
-      $file->save();
+    if (!empty($this->configuration['historical_rates'])) {
+      $this->exchangerManager->setHistorical($this->entityId, $exchange_rates);
     }
   }
 

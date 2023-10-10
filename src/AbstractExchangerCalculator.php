@@ -5,7 +5,6 @@ namespace Drupal\commerce_exchanger;
 use Drupal\commerce_exchanger\Exception\ExchangeRatesDataMismatchException;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_price\RounderInterface;
-use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
@@ -30,11 +29,11 @@ abstract class AbstractExchangerCalculator implements ExchangerCalculatorInterfa
   protected $providers;
 
   /**
-   * Config factory.
+   * The exchanger manager.
    *
-   * @var \Drupal\Core\Config\ConfigFactory
+   * @var \Drupal\commerce_exchanger\ExchangerManagerInterface
    */
-  protected $configFactory;
+  protected $exchangerManager;
 
   /**
    * Drupal commerce price rounder service.
@@ -44,17 +43,24 @@ abstract class AbstractExchangerCalculator implements ExchangerCalculatorInterfa
   protected $rounder;
 
   /**
+   * The static cache to avoid querying each time.
+   *
+   * @var array
+   */
+  protected array $rates = [];
+
+  /**
    * DefaultExchangerCalculator constructor.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   Entity type manager.
-   * @param \Drupal\Core\Config\ConfigFactory $config_factory
-   *   Drupal config factory.
+   * @param \Drupal\commerce_exchanger\ExchangerManagerInterface $exchanger_manager
+   *   Drupal exchanger manager.
    * @param \Drupal\commerce_price\RounderInterface $rounder
    *   Drupal commerce price rounder service.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, ConfigFactory $config_factory, RounderInterface $rounder) {
-    $this->configFactory = $config_factory;
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, ExchangerManagerInterface $exchanger_manager, RounderInterface $rounder) {
+    $this->exchangerManager = $exchanger_manager;
     $this->providers = $entity_type_manager->getStorage('commerce_exchange_rates')->loadMultiple();
     $this->rounder = $rounder;
   }
@@ -63,12 +69,6 @@ abstract class AbstractExchangerCalculator implements ExchangerCalculatorInterfa
    * {@inheritdoc}
    */
   public function priceConversion(Price $price, string $target_currency) {
-    $exchange_rates_config = $this->getExchangerId();
-
-    if (empty($exchange_rates_config)) {
-      throw new ExchangeRatesDataMismatchException('Not any active Exchange rates present');
-    }
-
     // Price currency.
     $price_currency = $price->getCurrencyCode();
 
@@ -82,22 +82,28 @@ abstract class AbstractExchangerCalculator implements ExchangerCalculatorInterfa
     // Determine rate.
     $rate = $exchange_rates[$price_currency][$target_currency]['value'] ?? 0;
 
-    // Don't allow multiply with zero or one.
+    // Don't allow to multiply with zero or one.
     if (empty($rate)) {
       throw new ExchangeRatesDataMismatchException('There are no exchange rates set for ' . $price_currency . ' and ' . $target_currency);
     }
 
     // Convert amount to target currency.
     $price = $price->convert($target_currency, (string) $rate);
-    $price = $this->rounder->round($price);
-    return $price;
+    return $this->rounder->round($price);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getExchangeRates() {
-    return $this->configFactory->get($this->getExchangerId())->get('rates') ?? [];
+    $exchanger_id = $this->getExchangerId();
+    if (empty($exchanger_id)) {
+      throw new ExchangeRatesDataMismatchException('Not any active Exchange rates present');
+    }
+    if (empty($this->rates[$exchanger_id])) {
+      $this->rates[$exchanger_id] = $this->exchangerManager->getLatest($exchanger_id);
+    }
+    return $this->rates[$exchanger_id];
   }
 
 }

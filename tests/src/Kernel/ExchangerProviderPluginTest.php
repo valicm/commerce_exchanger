@@ -3,7 +3,6 @@
 namespace Drupal\Tests\commerce_exchanger\Kernel;
 
 use Drupal\commerce_exchanger\Entity\ExchangeRates;
-use Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider\ExchangerProviderRemoteInterface;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
@@ -42,7 +41,7 @@ class ExchangerProviderPluginTest extends CommerceKernelTestBase {
   protected function setUp() :void {
     parent::setUp();
 
-    $this->installConfig(['commerce_exchanger']);
+    $this->installSchema('commerce_exchanger', ['commerce_exchanger_latest_rates']);
 
     // The parent has already imported USD.
     $currency_importer = $this->container->get('commerce_price.currency_importer');
@@ -96,13 +95,13 @@ class ExchangerProviderPluginTest extends CommerceKernelTestBase {
    * ::@covers ::crossSyncCalculate
    * ::@covers ::mapExchangeRates.
    */
-  public function testImportCrossSync() {
+  public function testImportCrossSyncTransformRates() {
     $this->test->import();
     $rates = $this->container->get('commerce_exchanger.calculate')->getExchangeRates();
-    $this->assertEquals(round(1 / 1.659999, ExchangerProviderRemoteInterface::EXCHANGER_ROUND_PRECISION), $rates['EUR']['AUD']['value']);
-    $this->assertEquals(round(1 / 1.19, ExchangerProviderRemoteInterface::EXCHANGER_ROUND_PRECISION), $rates['EUR']['USD']['value']);
-    $this->assertEquals(1.659999, $rates['AUD']['EUR']['value']);
-    $this->assertEquals(1.19, $rates['USD']['EUR']['value']);
+    $this->assertEquals(round(1 / 0.602409, 2), round($rates['EUR']['AUD']['value'], 2));
+    $this->assertEquals(round(1 / 0.840336, 2), round($rates['EUR']['USD']['value'], 2));
+    $this->assertEquals(0.602409, $rates['AUD']['EUR']['value']);
+    $this->assertEquals(0.840336, $rates['USD']['EUR']['value']);
   }
 
   /**
@@ -125,6 +124,37 @@ class ExchangerProviderPluginTest extends CommerceKernelTestBase {
 
     $this->assertEquals(1.19, $rates['EUR']['USD']['value']);
     $this->assertEquals(0.840336, $rates['USD']['EUR']['value']);
+  }
+
+  /**
+   * Test transform mode with cross sync options vs. direct enterprise values.
+   *
+   * ::@covers ::import
+   * ::@covers ::buildExchangeRates
+   * ::@covers ::importCrossSync
+   * ::@covers ::mapExchangeRates
+   * ::@covers ::processRemoteData
+   * ::@covers ::importEnterprise
+   * ::@covers \Drupal\commerce_exchanger\ExchangerProviderRates.
+   */
+  public function testCompareTransform() {
+    $this->test->import();
+    $transform_cross_sync_rates = $this->container->get('commerce_exchanger.manager')->getLatest('test');
+
+    // Import rates.
+    $this->enterprise->import();
+    $enterprise_rates = $this->container->get('commerce_exchanger.manager')->getLatest('enterprise');
+
+    // Confirm that all cross sync values with transform_mode are calculated
+    // properly from plugin "test" with values from enterprise plugin.
+    foreach ($transform_cross_sync_rates as $base_currency => $values) {
+      foreach ($values as $target_currency => $value) {
+        // Round values to two digit for test purposes.
+        // Cross sync at 6 digit is going to have
+        // minor difference from directly inserted values in enterprise mode.
+        $this->assertEquals(round($value['value'], 2), round($enterprise_rates[$base_currency][$target_currency]['value'], 2));
+      }
+    }
   }
 
 }

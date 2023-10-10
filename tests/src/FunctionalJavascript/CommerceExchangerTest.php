@@ -3,7 +3,6 @@
 namespace Drupal\Tests\commerce_exchanger\FunctionalJavascript;
 
 use Drupal\commerce_exchanger\Entity\ExchangeRates;
-use Drupal\commerce_exchanger\Entity\ExchangeRatesInterface;
 use Drupal\commerce_exchanger\Exception\ExchangeRatesDataMismatchException;
 use Drupal\commerce_price\Entity\Currency;
 use Drupal\commerce_price\Price;
@@ -29,6 +28,13 @@ class CommerceExchangerTest extends CommerceWebDriverTestBase {
    * @var \Drupal\commerce_price\Price
    */
   protected $priceUsd;
+
+  /**
+   * The exchange manager.
+   *
+   * @var \Drupal\commerce_exchanger\ExchangerManagerInterface
+   */
+  protected $exchangerManager;
 
   /**
    * {@inheritdoc}
@@ -57,6 +63,8 @@ class CommerceExchangerTest extends CommerceWebDriverTestBase {
     // The parent has already imported USD.
     $currency_importer = $this->container->get('commerce_price.currency_importer');
     $currency_importer->import('EUR');
+
+    $this->exchangerManager = $this->container->get('commerce_exchanger.manager');
 
     $this->priceEur = new Price('100', 'EUR');
     $this->priceUsd = new Price('100', 'USD');
@@ -90,9 +98,8 @@ class CommerceExchangerTest extends CommerceWebDriverTestBase {
 
     $this->assertEquals('ecb', $exchange_rates->getPluginId());
     $this->assertEquals('European Central Bank', $exchange_rates->label());
-    $this->assertEquals(ExchangeRatesInterface::COMMERCE_EXCHANGER_IMPORT . 'ecb_test', $exchange_rates->getExchangerConfigName());
 
-    $rates = $this->config($exchange_rates->getExchangerConfigName())->get('rates');
+    $rates = $this->exchangerManager->getLatest($exchange_rates->id());
 
     $this->assertIsArray($rates);
     $this->assertIsArray($rates['USD']['EUR']);
@@ -101,10 +108,10 @@ class CommerceExchangerTest extends CommerceWebDriverTestBase {
     $this->drupalGet('admin/commerce/config/exchange-rates');
     $this->getSession()->getPage()->clickLink('Run import');
 
-    $rates = $this->config($exchange_rates->getExchangerConfigName())->get('rates');
+    $rates = $this->exchangerManager->getLatest($exchange_rates->id());
     $this->assertIsArray($rates);
     $this->assertIsArray($rates['USD']['EUR']);
-    $this->assertIsNotString($rates['USD']['EUR']['value']);
+    $this->assertIsFloat($rates['USD']['EUR']['value']);
     $this->assertIsFloat($rates['USD']['EUR']['value']);
 
   }
@@ -170,7 +177,6 @@ class CommerceExchangerTest extends CommerceWebDriverTestBase {
       'plugin' => 'ecb',
     ]);
 
-    $config_rates = $exchange_rates->getExchangerConfigName();
     $entity_id = $exchange_rates->id();
 
     $this->drupalGet('admin/commerce/config/exchange-rates/' . $entity_id . '/delete');
@@ -181,7 +187,7 @@ class CommerceExchangerTest extends CommerceWebDriverTestBase {
     $exchange_rates_exists = (bool) ExchangeRates::load($entity_id);
     $this->assertEmpty($exchange_rates_exists, 'The exchange rates has been deleted from the database.');
 
-    $exchange_rates_config = $this->config($config_rates)->getRawData();
+    $exchange_rates_config = $this->exchangerManager->getLatest($entity_id);
     $this->assertEmpty($exchange_rates_config, 'The exchange rates configuration file has been deleted.');
 
     $this->assertSession()->pageTextContains(t('There are no exchange rates entities yet.'));

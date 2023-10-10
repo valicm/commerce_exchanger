@@ -92,16 +92,6 @@ class ExchangeRates extends ConfigEntityBase implements ExchangeRatesInterface {
   /**
    * {@inheritdoc}
    */
-  public function getExchangerConfigName() {
-    if (!$this->id) {
-      return NULL;
-    }
-    return self::COMMERCE_EXCHANGER_IMPORT . $this->id();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getWeight() {
     return $this->weight;
   }
@@ -200,10 +190,6 @@ class ExchangeRates extends ConfigEntityBase implements ExchangeRatesInterface {
    */
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
-
-    // Declare dependency on config where we store exchange rates.
-    // So when we delete entity that those data are also deleted.
-    $this->addDependency('config', $this->getExchangerConfigName());
 
     /** @var \Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider\ExchangerProviderInterface $plugin */
     $plugin = $this->getPlugin();

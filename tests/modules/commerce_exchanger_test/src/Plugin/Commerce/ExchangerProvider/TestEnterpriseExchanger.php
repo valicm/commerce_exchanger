@@ -11,7 +11,6 @@ use Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider\ExchangerProvide
  *   id = "enterprise",
  *   label = "Enterprise",
  *   display_label = "Enterprise",
- *   historical_rates = TRUE,
  *   enterprise = TRUE,
  *   api_key= TRUE,
  * )

@@ -11,7 +11,6 @@ use Drupal\Component\Serialization\Json;
  *   id = "open_exchange_rates",
  *   label = "Open Exchange Rates",
  *   display_label = "Open Exchange Rates",
- *   historical_rates = TRUE,
  *   enterprise = TRUE,
  *   api_key= TRUE,
  * )

@@ -11,12 +11,4 @@ use Drupal\Core\Plugin\PluginFormInterface;
  */
 interface ExchangerProviderInterface extends PluginInspectionInterface, PluginFormInterface, DerivativeInspectionInterface {
 
-  /**
-   * Return config object name where exchange rates are saved.
-   *
-   * @return string
-   *   Return drupal config file name where exchange rates are imported.
-   */
-  public function getConfigName();
-
 }
