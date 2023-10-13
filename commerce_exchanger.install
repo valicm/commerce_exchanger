@@ -67,12 +67,78 @@ function commerce_exchanger_update_10002(&$sandbox) {
 }
 
 /**
+ * Implements hook_update_N().
+ */
+function commerce_exchanger_update_10003(&$sandbox) {
+  $database = \Drupal::database();
+  $definitions = commerce_exchanger_schema();
+  $schema = $database->schema();
+
+  foreach ($definitions as $table => $definition) {
+    // Pull values.
+    $values = $database->select($table, 't')->fields('t')->execute()->fetchAll();
+    // Make a backup table.
+    $schema->renameTable($table, $table . '_backup');
+    // Recreate table
+    $schema->createTable($table, $definition);
+
+    $fields = [
+      'exchanger',
+      'source',
+      'target',
+      'value',
+      'manual',
+    ];
+
+    if ($table === 'commerce_exchanger_latest_rates') {
+      $fields[] = 'timestamp';
+    }
+    else {
+      $fields[] = 'date';
+    }
+
+    // Re-insert values.
+    $query = $database->insert($table)
+      ->fields($fields);
+    foreach ($values as $value) {
+      $items = [
+        'exchanger' => $value->exchanger,
+        'source' => $value->source,
+        'target' => $value->target,
+        'value' => $value->value,
+        'manual' => $value->manual,
+      ];
+
+      if ($table === 'commerce_exchanger_latest_rates') {
+        $items['timestamp'] = $value->timestamp;
+      }
+      else {
+        $items['date'] = $value->date;
+      }
+      $query->values($items);
+    }
+
+    $query->execute();
+
+    // Remove backup table.
+    $schema->dropTable($table . '_backup');
+  }
+
+}
+
+/**
  * Implements hook_schema().
  */
 function commerce_exchanger_schema() {
   $schema['commerce_exchanger_latest_rates'] = [
     'description' => 'Stores latest exchange rates.',
     'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Primary Key: ID.',
+      ],
       'exchanger' => [
         'description' => 'The commerce exchanger plugin',
         'type' => 'varchar',
@@ -112,6 +178,7 @@ function commerce_exchanger_schema() {
         'default' => 0,
       ],
     ],
+    'primary key' => ['id'],
     'indexes' => [
       'plugin_currency' => ['exchanger', 'source', 'target'],
     ],
@@ -119,6 +186,12 @@ function commerce_exchanger_schema() {
   $schema['commerce_exchanger_historical_rates'] = [
     'description' => 'Stores latest exchange rates.',
     'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Primary Key: ID.',
+      ],
       'exchanger' => [
         'description' => 'The commerce exchanger plugin',
         'type' => 'varchar',
@@ -157,6 +230,7 @@ function commerce_exchanger_schema() {
         'length' => 20,
       ],
     ],
+    'primary key' => ['id'],
     'indexes' => [
       'plugin_currency' => ['exchanger', 'source', 'target'],
     ],
