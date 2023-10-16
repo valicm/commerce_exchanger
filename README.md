@@ -1,3 +1,5 @@
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fvalicm%2Fcommerce_exchanger.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fvalicm%2Fcommerce_exchanger?ref=badge_shield)
+
 CONTENTS OF THIS FILE
 ---------------------
 * Introduction
@@ -128,3 +130,7 @@ MAINTAINERS
 The 8.x-1.x branch was created by:
 
  * Valentino Medimorec (valic) - https://www.drupal.org/u/valic
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fvalicm%2Fcommerce_exchanger.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fvalicm%2Fcommerce_exchanger?ref=badge_large)
