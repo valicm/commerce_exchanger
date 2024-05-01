@@ -39,7 +39,7 @@ class CommerceExchangerTest extends CommerceWebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'commerce_price',
     'commerce_exchanger',
   ];

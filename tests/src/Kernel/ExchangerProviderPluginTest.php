@@ -30,7 +30,7 @@ class ExchangerProviderPluginTest extends CommerceKernelTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'commerce_exchanger',
     'commerce_exchanger_test',
   ];
