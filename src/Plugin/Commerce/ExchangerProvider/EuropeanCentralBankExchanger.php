@@ -37,9 +37,8 @@ class EuropeanCentralBankExchanger extends ExchangerProviderRemoteBase {
       }
       catch (\Exception $e) {
         $this->logger->error($e->getMessage());
+        return NULL;
       }
-
-      $data = [];
 
       // Loop and build array.
       foreach ($xml->Cube->Cube->Cube as $rate) {
