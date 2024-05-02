@@ -167,6 +167,8 @@ class ExchangeRates extends ConfigEntityBase implements ExchangeRatesInterface {
     else {
       return parent::set($property_name, $value);
     }
+
+    return $this;
   }
 
   /**

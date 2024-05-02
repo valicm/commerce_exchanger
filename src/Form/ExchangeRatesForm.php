@@ -53,7 +53,7 @@ class ExchangeRatesForm extends EntityForm {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   Currency storage.
    * @param \Drupal\Core\Config\ConfigFactory $config_factory
-   *   Configuration managment.
+   *   Configuration management.
    * @param \Drupal\commerce_exchanger\ExchangerManagerInterface $exchanger_manager
    *   The exchange manager.
    */
@@ -181,7 +181,7 @@ class ExchangeRatesForm extends EntityForm {
       '#tree' => TRUE,
     ];
 
-    // See if plugin is manual. We dont need then flag for manual syncing.
+    // See if plugin is manual. We do not need then flag for manual syncing.
     $manual_plugin = !empty($plugin_definition[$exchanger->getPluginId()]['manual']);
 
     $demo_amount = $plugin_configuration['demo_amount'] ?? 100;
@@ -195,7 +195,7 @@ class ExchangeRatesForm extends EntityForm {
         '#open' => FALSE,
       ];
 
-      foreach ($currencies as $subkey => $subcurrency) {
+      foreach ($currencies as $subkey => $child_currency) {
         if ($key !== $subkey) {
 
           $default_rate = $data[$key][$subkey]['value'] ?? '0';
@@ -232,7 +232,7 @@ class ExchangeRatesForm extends EntityForm {
           else {
             $form['exchange_rates'][$key][$subkey]['value']['#description'] = $this->t('Exchange rate from @initial to @currency.', [
               '@initial' => $currency->getCurrencyCode(),
-              '@currency' => $subcurrency->getCurrencyCode(),
+              '@currency' => $child_currency->getCurrencyCode(),
             ]);
           }
 

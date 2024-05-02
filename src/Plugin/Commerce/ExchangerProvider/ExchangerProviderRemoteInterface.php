@@ -69,7 +69,7 @@ interface ExchangerProviderRemoteInterface {
    * Transforming in a required rate ratio based on base currency.
    *
    * @return bool
-   *   Return true if transfrom rates is ON.
+   *   Return true if transform rates is ON.
    */
   public function transformRates();
 

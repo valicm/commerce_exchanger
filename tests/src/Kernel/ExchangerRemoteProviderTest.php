@@ -70,7 +70,7 @@ class ExchangerRemoteProviderTest extends CommerceKernelTestBase {
       ],
       'currencies' => [
         'EUR' => 'Euro',
-        'USD' => 'Dolar',
+        'USD' => 'Dollar',
         'HRK' => 'Croatian Kuna',
       ],
       'transform' => TRUE,

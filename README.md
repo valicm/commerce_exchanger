@@ -142,4 +142,4 @@ MAINTAINERS
 
 The 8.x-1.x branch was created by:
 
- * Valentino Medimorec (valic) - https://www.drupal.org/u/valic
+ * https://www.drupal.org/u/valic

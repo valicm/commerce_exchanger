@@ -79,7 +79,7 @@ function commerce_exchanger_update_10003(&$sandbox) {
     $values = $database->select($table, 't')->fields('t')->execute()->fetchAll();
     // Make a backup table.
     $schema->renameTable($table, $table . '_backup');
-    // Recreate table
+    // Recreate table.
     $schema->createTable($table, $definition);
 
     $fields = [
