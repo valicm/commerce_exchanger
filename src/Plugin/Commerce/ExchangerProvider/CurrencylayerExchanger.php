@@ -50,8 +50,8 @@ class CurrencylayerExchanger extends ExchangerProviderRemoteBase {
       if (!empty($json['success'])) {
 
         // Leave base currency. In some cases we don't know base currency.
-        // Currencylayer on free plan uses your address for base currency, and in
-        // Drupal you could have different default value.
+        // Currencylayer on free plan uses your address for base currency,
+        // and in Drupal you could have different default value.
         $data['base'] = $json['source'];
 
         foreach ($json['quotes'] as $code => $rate) {
