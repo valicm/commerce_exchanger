@@ -6,38 +6,28 @@ use Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider\ExchangerProvide
 
 /**
  * Represents remote exchange rates data with base currency.
- *
- * @package Drupal\commerce_exchanger
  */
 class ExchangerProviderRates {
 
   /**
    * The base currency.
-   *
-   * @var string
    */
-  protected $baseCurrency;
+  protected string $baseCurrency;
 
   /**
    * The provided rates from external provider.
-   *
-   * @var array
    */
-  protected $rates;
+  protected array $rates;
 
   /**
    * The list of enabled currencies.
-   *
-   * @var array
    */
-  protected $currencies;
+  protected array $currencies;
 
   /**
    * Determine if transform prices is needed.
-   *
-   * @var bool
    */
-  protected $transform;
+  protected bool $transform;
 
   /**
    * Constructs a new ExchangerProviderRates instance.
@@ -56,7 +46,7 @@ class ExchangerProviderRates {
       throw new \InvalidArgumentException('The property "rates" must be an array.');
     }
 
-    $this->currencies = $definition['currencies'] ?? NULL;
+    $this->currencies = $definition['currencies'] ?? [];
     $this->baseCurrency = $definition['base'];
     $this->transform = $definition['transform'] ?? FALSE;
 
@@ -91,7 +81,7 @@ class ExchangerProviderRates {
    * @return string
    *   Return currency ISO code.
    */
-  public function getBaseCurrency() {
+  public function getBaseCurrency(): string {
     return $this->baseCurrency;
   }
 
@@ -101,7 +91,7 @@ class ExchangerProviderRates {
    * @return array
    *   Keyed array by currency code, and value for rate. ['HRK' => '0.5']
    */
-  public function getRates() {
+  public function getRates(): array {
     return $this->rates;
   }
 
@@ -111,7 +101,7 @@ class ExchangerProviderRates {
    * @return bool
    *   Return true if price where transformed.
    */
-  public function isTransform() {
+  public function isTransform(): bool {
     return $this->transform;
   }
 
@@ -121,7 +111,7 @@ class ExchangerProviderRates {
    * @return array
    *   Return keyed currencies by currency code.
    */
-  public function getCurrencies() {
+  public function getCurrencies(): array {
     return $this->currencies;
   }
 

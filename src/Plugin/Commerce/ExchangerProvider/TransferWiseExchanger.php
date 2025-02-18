@@ -3,20 +3,21 @@
 namespace Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\commerce_exchanger\Attribute\CommerceExchangerProvider;
 use GuzzleHttp\RequestOptions;
 
 /**
  * Provides the wise.com exchange rates.
- *
- * @CommerceExchangerProvider(
- *   id = "transferwise",
- *   label = "Wise",
- *   display_label = "Wise",
- *   enterprise = TRUE,
- *   api_key = TRUE,
- *   modes = TRUE,
- * )
  */
+#[CommerceExchangerProvider(
+  id: "transferwise",
+  label: new TranslatableMarkup("Wise"),
+  display_label: new TranslatableMarkup("Wise"),
+  modes: TRUE,
+  api_key: TRUE,
+  enterprise: TRUE,
+)]
 class TransferWiseExchanger extends ExchangerProviderRemoteBase {
 
   /**

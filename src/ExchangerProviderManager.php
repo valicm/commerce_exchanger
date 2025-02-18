@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_exchanger;
 
-use Drupal\commerce_exchanger\Annotation\CommerceExchangerProvider;
+use Drupal\commerce_exchanger\Attribute\CommerceExchangerProvider;
 use Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider\ExchangerProviderInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;

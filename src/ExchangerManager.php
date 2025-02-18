@@ -12,20 +12,6 @@ use Drupal\Core\Database\Connection;
 class ExchangerManager implements ExchangerManagerInterface {
 
   /**
-   * The database.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected Connection $database;
-
-  /**
-   * The time.
-   *
-   * @var \Drupal\Component\Datetime\TimeInterface
-   */
-  protected TimeInterface $time;
-
-  /**
    * The ExchangerManager constructor.
    *
    * @param \Drupal\Core\Database\Connection $database
@@ -33,10 +19,7 @@ class ExchangerManager implements ExchangerManagerInterface {
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time.
    */
-  public function __construct(Connection $database, TimeInterface $time) {
-    $this->database = $database;
-    $this->time = $time;
-  }
+  public function __construct(protected Connection $database, protected TimeInterface $time) {}
 
   /**
    * {@inheritdoc}
@@ -91,7 +74,7 @@ class ExchangerManager implements ExchangerManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getHistorical($exchanger_id, string $date = NULL): array {
+  public function getHistorical($exchanger_id, ?string $date = NULL): array {
     $results = $this->database->select(ExchangerManagerInterface::EXCHANGER_HISTORICAL_RATES, 'e')
       ->fields('e', ['source', 'target', 'value', 'date'])
       ->condition('e.exchanger', $exchanger_id);
@@ -116,7 +99,7 @@ class ExchangerManager implements ExchangerManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function setHistorical($exchanger_id, array $rates, string $date = NULL): void {
+  public function setHistorical($exchanger_id, array $rates, ?string $date = NULL): void {
 
     if (!$date) {
       $date = date('Y-m-d', $this->time->getCurrentTime());

@@ -2,19 +2,20 @@
 
 namespace Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\commerce_exchanger\Attribute\CommerceExchangerProvider;
 use Drupal\Component\Serialization\Json;
 
 /**
  * Provides the Fixer.io exchange rates.
- *
- * @CommerceExchangerProvider(
- *   id = "fixer",
- *   label = "Fixer.io",
- *   display_label = "Fixer.io",
- *   enterprise = TRUE,
- *   api_key= TRUE,
- * )
  */
+#[CommerceExchangerProvider(
+  id: "fixer",
+  label: new TranslatableMarkup("Fixer.io"),
+  display_label: new TranslatableMarkup("Fixer.io"),
+  api_key: TRUE,
+  enterprise: TRUE,
+)]
 class FixerExchanger extends ExchangerProviderRemoteBase {
 
   /**

@@ -2,19 +2,20 @@
 
 namespace Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Component\Serialization\Json;
+use Drupal\commerce_exchanger\Attribute\CommerceExchangerProvider;
 
 /**
  * Provides the Currencylayer.com exchange rates.
- *
- * @CommerceExchangerProvider(
- *   id = "currencylayer",
- *   label = "Currencylayer",
- *   display_label = "currencylayer.com",
- *   enterprise = TRUE,
- *   api_key= TRUE,
- * )
  */
+#[CommerceExchangerProvider(
+  id: "currencylayer",
+  label: new TranslatableMarkup("Currencylayer"),
+  display_label: new TranslatableMarkup("currencylayer.com"),
+  api_key: TRUE,
+  enterprise: TRUE,
+)]
 class CurrencylayerExchanger extends ExchangerProviderRemoteBase {
 
   /**

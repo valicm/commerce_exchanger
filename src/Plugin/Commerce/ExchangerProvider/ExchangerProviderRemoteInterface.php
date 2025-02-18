@@ -10,7 +10,7 @@ interface ExchangerProviderRemoteInterface {
   /**
    * Declare default round precision used in cross sync conversions.
    */
-  public const EXCHANGER_ROUND_PRECISION = 6;
+  public const int EXCHANGER_ROUND_PRECISION = 6;
 
   /**
    * URL from remote provider upon API call should be made.

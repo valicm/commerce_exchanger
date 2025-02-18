@@ -2,20 +2,21 @@
 
 namespace Drupal\commerce_exchanger_test\Plugin\Commerce\ExchangerProvider;
 
+use Drupal\commerce_exchanger\Attribute\CommerceExchangerProvider;
 use Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider\ExchangerProviderRemoteBase;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Provides the test exchange rates.
- *
- * @CommerceExchangerProvider(
- *   id = "test",
- *   label = "Test",
- *   display_label = "Test",
- *   base_currency = "EUR",
- *   refresh_once = TRUE,
- *   transform_rates = TRUE,
- * )
  */
+#[CommerceExchangerProvider(
+  id: "test",
+  label: new TranslatableMarkup("Test"),
+  display_label: new TranslatableMarkup("Test"),
+  base_currency: 'EUR',
+  refresh_once: TRUE,
+  transform_rates: TRUE,
+)]
 class TestExchanger extends ExchangerProviderRemoteBase {
 
   /**

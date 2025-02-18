@@ -88,7 +88,7 @@ abstract class ExchangerProviderRemoteBase extends ExchangerProviderBase impleme
    * @return array
    *   Return prepared data for saving.
    */
-  protected function buildExchangeRates() {
+  protected function buildExchangeRates(): array {
     // If we use enterprise and we don't want cross sync feature.
     if ($this->isEnterprise() && !$this->useCrossSync()) {
       return $this->importEnterprise();
@@ -104,7 +104,7 @@ abstract class ExchangerProviderRemoteBase extends ExchangerProviderBase impleme
    * @return array
    *   Return array of exchange rates.
    */
-  protected function importCrossSync() {
+  protected function importCrossSync(): array {
     $exchange_rates_data = $this->processRemoteData();
     // Based on cross sync settings fetch and process data.
     return $this->crossSyncCalculate($exchange_rates_data);
@@ -116,7 +116,7 @@ abstract class ExchangerProviderRemoteBase extends ExchangerProviderBase impleme
    * @return array
    *   Return array of exchange rates.
    */
-  protected function importEnterprise() {
+  protected function importEnterprise(): array {
     $exchange_rates = [];
     foreach ($this->currencies as $code => $currency) {
       $exchange_rates_data = $this->processRemoteData($code);
@@ -134,7 +134,7 @@ abstract class ExchangerProviderRemoteBase extends ExchangerProviderBase impleme
    * @return \Drupal\commerce_exchanger\ExchangerProviderRates
    *   The ExchangeRates.
    */
-  protected function processRemoteData(string $base_currency = NULL) {
+  protected function processRemoteData(?string $base_currency = NULL): ExchangerProviderRates {
     $remote_data = $this->getRemoteData($base_currency);
 
     // Validate and build structure.
@@ -161,7 +161,7 @@ abstract class ExchangerProviderRemoteBase extends ExchangerProviderBase impleme
    * @return array
    *   Return data prepared for saving.
    */
-  protected function crossSyncCalculate(ExchangerProviderRates $exchange_rates) {
+  protected function crossSyncCalculate(ExchangerProviderRates $exchange_rates): array {
     $calculated_rates = [];
 
     // Enabled currency.
@@ -185,7 +185,7 @@ abstract class ExchangerProviderRemoteBase extends ExchangerProviderBase impleme
    * @return array
    *   Return array prepared for saving in Drupal config.
    */
-  protected function mapExchangeRates(ExchangerProviderRates $exchange_rates) {
+  protected function mapExchangeRates(ExchangerProviderRates $exchange_rates): array {
     // Get current exchange rates.
     $mapping = $this->exchangerManager->getLatest($this->entityId);
 
@@ -224,7 +224,7 @@ abstract class ExchangerProviderRemoteBase extends ExchangerProviderBase impleme
    * @return \Drupal\commerce_exchanger\ExchangerProviderRates
    *   Return recalculated data.
    */
-  protected function recalculateRates(string $target_currency, ExchangerProviderRates $data) {
+  protected function recalculateRates(string $target_currency, ExchangerProviderRates $data): ExchangerProviderRates {
     $rates = $data->getRates();
     $base_currency = $data->getBaseCurrency();
 

@@ -2,19 +2,20 @@
 
 namespace Drupal\commerce_exchanger_test\Plugin\Commerce\ExchangerProvider;
 
+use Drupal\commerce_exchanger\Attribute\CommerceExchangerProvider;
 use Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider\ExchangerProviderRemoteBase;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Provides the enterprise exchange rates.
- *
- * @CommerceExchangerProvider(
- *   id = "enterprise",
- *   label = "Enterprise",
- *   display_label = "Enterprise",
- *   enterprise = TRUE,
- *   api_key= TRUE,
- * )
  */
+#[CommerceExchangerProvider(
+  id: "enterprise",
+  label: new TranslatableMarkup("Enterprise"),
+  display_label: new TranslatableMarkup("Enterprise"),
+  api_key: TRUE,
+  enterprise: TRUE,
+)]
 class TestEnterpriseExchanger extends ExchangerProviderRemoteBase {
 
   /**

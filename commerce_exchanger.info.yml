@@ -1,10 +1,8 @@
 name: 'Commerce Exchanger'
 type: module
-description: 'Commerce 2 Exchange Rates'
-core_version_requirement: ^10.1 || ^11
+description: 'Commerce Core Exchange Rates'
+core_version_requirement: ^10.3 || ^11
 package: Commerce (Contrib)
 
 dependencies:
   - commerce:commerce_price
-
-php: 8.0

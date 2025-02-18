@@ -2,17 +2,19 @@
 
 namespace Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\commerce_exchanger\Attribute\CommerceExchangerProvider;
+
 /**
  * Provides EuropeanCentralBank.
- *
- * @CommerceExchangerProvider(
- *   id = "ecb",
- *   label = "European Central Bank",
- *   display_label = "European Central Bank",
- *   base_currency = "EUR",
- *   refresh_once = TRUE,
- * )
  */
+#[CommerceExchangerProvider(
+  id: "ecb",
+  label: new TranslatableMarkup("European Central Bank"),
+  display_label: new TranslatableMarkup("European Central Bank"),
+  base_currency: "EUR",
+  refresh_once: TRUE,
+)]
 class EuropeanCentralBankExchanger extends ExchangerProviderRemoteBase {
 
   /**

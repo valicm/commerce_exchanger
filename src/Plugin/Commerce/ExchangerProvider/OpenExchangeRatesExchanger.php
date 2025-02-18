@@ -3,18 +3,19 @@
 namespace Drupal\commerce_exchanger\Plugin\Commerce\ExchangerProvider;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\commerce_exchanger\Attribute\CommerceExchangerProvider;
 
 /**
  * Provides the Open Exchange Rates API integration.
- *
- * @CommerceExchangerProvider(
- *   id = "open_exchange_rates",
- *   label = "Open Exchange Rates",
- *   display_label = "Open Exchange Rates",
- *   enterprise = TRUE,
- *   api_key= TRUE,
- * )
  */
+#[CommerceExchangerProvider(
+  id: "open_exchange_rates",
+  label: new TranslatableMarkup("Open Exchange Rates"),
+  display_label: new TranslatableMarkup("Open Exchange Rates"),
+  api_key: TRUE,
+  enterprise: TRUE,
+)]
 class OpenExchangeRatesExchanger extends ExchangerProviderRemoteBase {
 
   /**

@@ -7,23 +7,22 @@ use Drupal\commerce_exchanger\ExchangerCalculatorInterface;
 use Drupal\commerce_exchanger\ExchangerManagerInterface;
 use Drupal\commerce_price\Plugin\Field\FieldFormatter\PriceDefaultFormatter;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'commerce_price_exchanger' formatter.
- *
- * @FieldFormatter(
- *   id = "commerce_price_exchanger",
- *   label = @Translation("Currency converter price"),
- *   field_types = {
- *     "commerce_price"
- *   }
- * )
  */
+#[FieldFormatter(
+  id: "commerce_price_exchanger",
+  label: new TranslatableMarkup("Currency converter price"),
+  field_types: ["commerce_price"],
+)]
 class PriceExchangerFormatter extends PriceDefaultFormatter {
 
   /**
