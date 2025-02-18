@@ -34,7 +34,7 @@ class ExchangerManager implements ExchangerManagerInterface {
 
     foreach ($results as $result) {
       $output[$result->source][$result->target] = [
-        'value' => (float) $result->value,
+        'value' => $result->value,
         'manual' => $result->manual,
       ];
     }

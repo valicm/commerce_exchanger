@@ -111,8 +111,8 @@ class CommerceExchangerTest extends CommerceWebDriverTestBase {
     $rates = $this->exchangerManager->getLatest($exchange_rates->id());
     $this->assertIsArray($rates);
     $this->assertIsArray($rates['USD']['EUR']);
-    $this->assertIsFloat($rates['USD']['EUR']['value']);
-    $this->assertIsFloat($rates['USD']['EUR']['value']);
+    $this->assertIsString($rates['USD']['EUR']['value']);
+    $this->assertIsString($rates['USD']['EUR']['value']);
 
   }
 
