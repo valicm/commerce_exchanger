@@ -53,6 +53,10 @@ class ExchangerManager implements ExchangerManagerInterface {
 
     foreach ($rates as $source => $rate) {
       foreach ($rate as $target => $values) {
+        // Only allow saving numerical values.
+        if (!is_numeric($values['value'])) {
+          throw new \RuntimeException("Rate value must be a valid numeric value. Make sure the value is not empty and use '.' as a delimiter.");
+        }
         $query->values([
           'exchanger' => $exchanger_id,
           'source' => $source,

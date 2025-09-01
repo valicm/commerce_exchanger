@@ -221,6 +221,11 @@ class ExchangeRatesForm extends EntityForm {
                 '@amount' => ($demo_amount * $default_rate),
               ]
             ),
+            '#states' => [
+              'enabled' => [
+                [':input[name="exchange_rates[' . $key .'][' . $subkey .'][manual]"]' => ['checked' => TRUE]],
+              ],
+            ],
           ];
 
           // Based on cross sync value render form elements.
@@ -266,6 +271,22 @@ class ExchangeRatesForm extends EntityForm {
    */
   public static function ajaxRefresh(array $form, FormStateInterface $form_state) {
     return $form;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    // Validate exchange rates values.
+    $rates = $form_state->getValue(['exchange_rates']);
+
+    foreach ($rates as $source => $rate) {
+      foreach ($rate as $target => $values) {
+        if (!is_numeric($values['value'])) {
+          $form_state->setError($form['exchange_rates'][$source][$target]['value'], $this->t("Rate value must be a valid numeric value. Make sure the value is not empty and use '.' as a delimiter."));
+        }
+      }
+    }
   }
 
   /**
